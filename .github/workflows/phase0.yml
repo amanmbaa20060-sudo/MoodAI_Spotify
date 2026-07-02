@@ -1,0 +1,32 @@
+name: Phase 0 CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Unit tests
+        run: pytest tests/ -v
+
+      - name: Generate sample catalog
+        run: python scripts/generate_sample_catalog.py --per-mood 250
+
+      - name: Dry-run mood tagging
+        run: python scripts/excel_to_db.py --source data/seed/v1/sample_tracks.csv --dry-run
+
+      - name: Validate coverage (CSV)
+        run: python scripts/validate_coverage.py --csv data/seed/v1/track_mood_tags.csv

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MoodAI Phase 1 MVP</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      .panel {
+        background: #111827;
+        border: 1px solid #1f2937;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      .moods {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      button {
+        border: 0;
+        border-radius: 999px;
+        padding: 10px 14px;
+        cursor: pointer;
+        background: #1f2937;
+        color: #e5e7eb;
+      }
+      button.active {
+        background: #22c55e;
+        color: #052e16;
+        font-weight: bold;
+      }
+      .track {
+        border-top: 1px solid #1f2937;
+        padding: 12px 0;
+      }
+      .muted {
+        color: #94a3b8;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>MoodAI Discovery Gateway</h1>
+      <p class="muted">Demo auth uses the <code>X-User-Id</code> header. This UI uses <code>demo-user</code>.</p>
+
+      <section class="panel">
+        <h2>Your mood</h2>
+        <div id="moods" class="moods"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Discovery Drop</h2>
+        <p id="dropHeader" class="muted">Loading...</p>
+        <div id="dropTracks"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Fresh Picks</h2>
+        <div id="freshTracks"></div>
+      </section>
+    </main>
+
+    <script>
+      const headers = { "X-User-Id": "demo-user", "Content-Type": "application/json" };
+
+      async function fetchHome() {
+        const response = await fetch("/v1/home", { headers });
+        return response.json();
+      }
+
+      async function setMood(mood) {
+        await fetch("/v1/users/me/mood", {
+          method: "PUT",
+          headers,
+          body: JSON.stringify({ mood, persist: true }),
+        });
+        await render();
+      }
+
+      function trackMarkup(track) {
+        return `
+          <div class="track">
+            <strong>${track.title}</strong><br />
+            <span class="muted">${(track.artists || []).join(", ") || "Unknown artist"}</span><br />
+            <span>${track.reason_text}</span>
+          </div>
+        `;
+      }
+
+      async function render() {
+        const home = await fetchHome();
+        const moodGateway = home.modules.find((module) => module.type === "mood_gateway");
+        const discoveryDrop = home.modules.find((module) => module.type === "discovery_drop");
+        const freshPicks = home.modules.find((module) => module.type === "fresh_picks");
+
+        document.getElementById("moods").innerHTML = moodGateway.data.options
+          .map(
+            (mood) => `
+            <button class="${mood === moodGateway.data.active_mood ? "active" : ""}" onclick="setMood('${mood}')">
+              ${mood.replace("_", " ")}
+            </button>
+          `
+          )
+          .join("");
+
+        document.getElementById("dropHeader").textContent = discoveryDrop.data.header;
+        document.getElementById("dropTracks").innerHTML = discoveryDrop.data.tracks.map(trackMarkup).join("");
+        document.getElementById("freshTracks").innerHTML = freshPicks.data.tracks.slice(0, 10).map(trackMarkup).join("");
+      }
+
+      render();
+    </script>
+  </body>
+</html>

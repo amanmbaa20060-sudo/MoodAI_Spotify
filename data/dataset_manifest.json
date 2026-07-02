@@ -1,0 +1,14 @@
+{
+  "dataset_version": "v1.1.0",
+  "source": "data\\source\\Music_Data.csv",
+  "track_count": 114000,
+  "mood_tagged_count": 31329,
+  "mood_coverage": {
+    "ENERGISED": 13733,
+    "FOCUSED": 227,
+    "LOW_KEY": 2564,
+    "NOSTALGIC": 10948,
+    "SAD": 5277
+  },
+  "adventurous_tags": 0
+}

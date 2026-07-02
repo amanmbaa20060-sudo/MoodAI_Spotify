@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MoodAI Phase 2</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+      main { max-width: 960px; margin: 0 auto; padding: 24px; }
+      .panel { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+      .moods, .artist-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+      .artist-card { width: 140px; text-align: center; }
+      .artist-card img { width: 120px; height: 120px; border-radius: 12px; object-fit: cover; }
+      button, input { border: 0; border-radius: 999px; padding: 10px 14px; }
+      button { cursor: pointer; background: #1f2937; color: #e5e7eb; }
+      button.active { background: #22c55e; color: #052e16; font-weight: bold; }
+      button.small { font-size: 12px; padding: 6px 10px; margin-top: 6px; }
+      input { background: #1f2937; color: #e5e7eb; border-radius: 8px; width: 240px; }
+      .track { border-top: 1px solid #1f2937; padding: 12px 0; }
+      .muted { color: #94a3b8; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>MoodAI — Trust & Browse</h1>
+      <p class="muted">Phase 2 demo · <code>X-User-Id: demo-user</code></p>
+
+      <section class="panel">
+        <h2>Artist search</h2>
+        <input id="searchQuery" placeholder="Search artists..." />
+        <button onclick="searchArtists()">Search</button>
+        <div id="artistGrid" class="artist-grid" style="margin-top:16px"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Your mood</h2>
+        <div id="moods" class="moods"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Discovery Drop</h2>
+        <p id="dropHeader" class="muted">Loading...</p>
+        <div id="dropTracks"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Fresh Picks</h2>
+        <div id="freshTracks"></div>
+      </section>
+    </main>
+
+    <script>
+      const headers = { "X-User-Id": "demo-user", "Content-Type": "application/json" };
+      let currentDropId = null;
+
+      async function searchArtists() {
+        const q = document.getElementById("searchQuery").value.trim();
+        if (!q) return;
+        const response = await fetch(`/v1/search/artists?q=${encodeURIComponent(q)}`, { headers });
+        const data = await response.json();
+        document.getElementById("artistGrid").innerHTML = data.artists.map((artist) => `
+          <div class="artist-card">
+            <img src="${artist.image_url}" alt="${artist.image_alt}" />
+            <div>${artist.name}</div>
+            <div class="muted">${artist.track_count} tracks</div>
+          </div>
+        `).join("");
+      }
+
+      async function reportHeardBefore(trackId) {
+        await fetch(`/v1/discovery-drop/tracks/${trackId}/heard-before`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ drop_id: currentDropId }),
+        });
+        alert("Thanks — we'll avoid this track in future drops.");
+      }
+
+      async function setMood(mood) {
+        await fetch("/v1/users/me/mood", { method: "PUT", headers, body: JSON.stringify({ mood, persist: true }) });
+        await render();
+      }
+
+      function trackMarkup(track, showHeardBefore = false) {
+        return `
+          <div class="track">
+            <strong>${track.title}</strong><br />
+            <span class="muted">${(track.artists || []).join(", ") || "Unknown artist"}</span><br />
+            <span>${track.reason_text}</span>
+            ${showHeardBefore ? `<button class="small" onclick="reportHeardBefore('${track.track_id}')">Heard it before</button>` : ""}
+          </div>
+        `;
+      }
+
+      async function render() {
+        const home = await (await fetch("/v1/home", { headers })).json();
+        const moodGateway = home.modules.find((m) => m.type === "mood_gateway");
+        const discoveryDrop = home.modules.find((m) => m.type === "discovery_drop");
+        const freshPicks = home.modules.find((m) => m.type === "fresh_picks");
+        currentDropId = discoveryDrop.data.drop_id;
+
+        document.getElementById("moods").innerHTML = moodGateway.data.options.map((mood) => `
+          <button class="${mood === moodGateway.data.active_mood ? "active" : ""}" onclick="setMood('${mood}')">
+            ${mood.replace("_", " ")}
+          </button>
+        `).join("");
+
+        document.getElementById("dropHeader").textContent = discoveryDrop.data.header;
+        document.getElementById("dropTracks").innerHTML = discoveryDrop.data.tracks.map((t) => trackMarkup(t, true)).join("");
+        document.getElementById("freshTracks").innerHTML = freshPicks.data.tracks.slice(0, 10).map((t) => trackMarkup(t)).join("");
+      }
+
+      render();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# Data (keep structure, ignore large/local sources)
+data/source/*.csv
+!data/source/README.md
+data/seed/v1/*.csv
+!data/seed/v1/sample_tracks.csv
+!data/source/README.md
+!data/seed/v1/.gitkeep
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
