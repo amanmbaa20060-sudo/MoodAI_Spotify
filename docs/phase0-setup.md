@@ -14,7 +14,7 @@ pytest tests/ -v
 For **database load**, use either:
 
 - **Docker Desktop** + `docker compose up -d`, then `python scripts/seed_all.py --generate`
-- **Railway Postgres** — set `DATABASE_URL` in `.env`, run `python scripts/apply_schemas.py`, then `seed_all.py`
+- **Render Postgres** — set `DATABASE_URL` in `.env`, run `python scripts/apply_schemas.py`, then `seed_all.py`
 
 ### Windows ARM note
 
@@ -47,14 +47,14 @@ Place your file at `data/source/tracks.xlsx`, then:
 python scripts/seed_all.py --source data/source/tracks.xlsx
 ```
 
-## Railway Postgres (optional)
+## Render Postgres (optional)
 
-1. Create a **PostgreSQL** database in a [Railway](https://railway.com) project.
-2. Copy the **public** connection string into `.env` as `DATABASE_URL`.
+1. Create a **PostgreSQL** instance on [Render](https://render.com).
+2. Copy the **external** connection string into `.env` as `DATABASE_URL`.
 3. Run: `python scripts/apply_schemas.py`
 4. Run: `python scripts/seed_all.py --source data/source/tracks.xlsx`
 
-Use Railway **reference variables** (`${{Postgres.DATABASE_URL}}`) for services in the same project.
+Use the **internal** URL for services deployed on Render in the same region.
 
 ## Verify
 
@@ -69,4 +69,4 @@ pytest tests/ -v
 - [x] ≥1,000 tracks loaded
 - [x] ≥200 tracks per dataset mood
 - [x] Zero ADVENTUROUS tags in dataset
-- [x] Same seed script works locally (and Railway with `DATABASE_URL`)
+- [x] Same seed script works locally (and Render with `DATABASE_URL`)
