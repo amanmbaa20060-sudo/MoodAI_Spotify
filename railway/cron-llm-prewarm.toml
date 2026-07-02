@@ -1,0 +1,11 @@
+# Railway cron: LLM reason cache prewarm (every 6h)
+# Service settings → Config file path: railway/cron-llm-prewarm.toml
+
+[build]
+builder = "RAILPACK"
+buildCommand = "pip install -r requirements-prod.txt"
+
+[deploy]
+startCommand = "python phases/phase-2/scripts/llm_prewarm.py"
+cronSchedule = "0 */6 * * *"
+restartPolicyType = "NEVER"

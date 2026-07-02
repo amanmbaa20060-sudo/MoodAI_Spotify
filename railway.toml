@@ -1,0 +1,13 @@
+# MoodAI API (Phase 3 web service)
+# Docs: docs/production-runbook.md
+# Cron services use config files under railway/
+
+[build]
+builder = "RAILPACK"
+buildCommand = "pip install -r requirements-prod.txt"
+
+[deploy]
+startCommand = "cd phases/phase-3 && uvicorn app.main:create_app --factory --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/healthz"
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"

@@ -29,4 +29,4 @@ Phase 2  →  artist grid search + heard-before feedback
 Phase 3  →  smart defaults + edge cache + optimization jobs
 ```
 
-**Production:** deploy Phase 3 via root [`render.yaml`](../render.yaml) — see [docs/production-runbook.md](../docs/production-runbook.md).
+**Production:** deploy Phase 3 via root [`railway.toml`](../railway.toml) — see [docs/production-runbook.md](../docs/production-runbook.md).

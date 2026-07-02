@@ -4,19 +4,20 @@ Mood-First Discovery Gateway — grad project implementing mood-led music discov
 
 **Repository:** [github.com/amanmbaa20060-sudo/MoodAI_Spotify](https://github.com/amanmbaa20060-sudo/MoodAI_Spotify)
 
-## Production (Render)
+## Production (Railway)
 
-Deploy with the root [`render.yaml`](render.yaml) blueprint and follow **[docs/production-runbook.md](docs/production-runbook.md)**:
+Deploy with root [`railway.toml`](railway.toml) and follow **[docs/production-runbook.md](docs/production-runbook.md)**:
 
-1. Connect repo to Render Blueprint → creates Postgres, Redis, API, crons.
-2. Set `GROQ_API_KEY` in the dashboard.
-3. From your laptop (with `Music_Data.csv`):
+1. Create a Railway project from GitHub → add **Postgres** + **Redis**.
+2. Deploy **moodai-api** (uses `railway.toml`); add cron services with configs under `railway/`.
+3. Set `GROQ_API_KEY` and reference variables (`DATABASE_URL`, `REDIS_URL`).
+4. From your laptop (with `Music_Data.csv`):
    ```bash
-   set DATABASE_URL=<Render external database URL>
-   python scripts/render_apply_schemas.py
+   set DATABASE_URL=<Railway Postgres public URL>
+   python scripts/apply_schemas.py
    python scripts/seed_all.py --source data/source/Music_Data.csv
    ```
-4. Open `https://<your-service>.onrender.com/` and test with `X-User-Id: demo-user`.
+5. Open your Railway domain and test with `X-User-Id: demo-user`.
 
 The API serves from **Postgres**, not the CSV file, at runtime.
 
@@ -38,8 +39,8 @@ python scripts/seed_all.py --generate
 | [docs/problemstatement.md](docs/problemstatement.md) | Product problem & solution |
 | [docs/architecture.md](docs/architecture.md) | System architecture, LLM layer, dataset mood rules (§6.5) |
 | [docs/phasewiseimplementation.md](docs/phasewiseimplementation.md) | Phase-wise build plan (0–3) |
-| [docs/phase0-setup.md](docs/phase0-setup.md) | Phase 0 local + Render setup |
-| [docs/production-runbook.md](docs/production-runbook.md) | **Production deploy on Render** |
+| [docs/phase0-setup.md](docs/phase0-setup.md) | Phase 0 local + hosted DB setup |
+| [docs/production-runbook.md](docs/production-runbook.md) | **Production deploy on Railway** |
 | [phases/README.md](phases/README.md) | Phase 1–3 API implementations |
 
 ## Quick start (Excel → database → model)
@@ -126,7 +127,7 @@ Excel (.xlsx)  →  excel_to_db.py  →  PostgreSQL (tracks, track_mood_tags)
 ## Production
 
 - Host **Excel** in private blob storage (S3/Azure) — source only, not runtime
-- Host **PostgreSQL** + **Redis** on Render / RDS / similar
+- Host **PostgreSQL** + **Redis** on Railway / RDS / similar
 - Run the same `excel_to_db.py` against production `DATABASE_URL`
 - Pin `DATASET_VERSION` in env (see architecture §6.5)
 

@@ -1,0 +1,11 @@
+# Railway cron: candidate pool cache prewarm (every 6h, offset 30m)
+# Service settings → Config file path: railway/cron-candidate-prewarm.toml
+
+[build]
+builder = "RAILPACK"
+buildCommand = "pip install -r requirements-prod.txt"
+
+[deploy]
+startCommand = "python phases/phase-3/scripts/candidate_prewarm.py"
+cronSchedule = "30 */6 * * *"
+restartPolicyType = "NEVER"
