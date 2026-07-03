@@ -39,7 +39,7 @@ Create the same resources as listed in `render.yaml` and wire `DATABASE_URL` / `
 
 | Service | Build command | Start command |
 |---------|---------------|---------------|
-| `moodai-api` | `pip install -r requirements-prod.txt` | `cd phases/phase-3 && uvicorn app.main:create_app --factory --host 0.0.0.0 --port $PORT` |
+| `moodai-api` | `pip install --upgrade pip && pip install -r requirements-prod.txt` | `bash scripts/render_start.sh` |
 | `moodai-daily-drop` | `pip install -r requirements-prod.txt` | `python phases/phase-1/scripts/generate_drop.py` |
 | `moodai-llm-prewarm` | `pip install -r requirements-prod.txt` | `python phases/phase-2/scripts/llm_prewarm.py` |
 | `moodai-candidate-prewarm` | `pip install -r requirements-prod.txt` | `python phases/phase-3/scripts/candidate_prewarm.py` |

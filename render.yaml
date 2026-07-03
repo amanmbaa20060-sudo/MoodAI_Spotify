@@ -22,8 +22,8 @@ services:
     runtime: python
     region: oregon
     plan: starter
-    buildCommand: pip install -r requirements-prod.txt
-    startCommand: cd phases/phase-3 && uvicorn app.main:create_app --factory --host 0.0.0.0 --port $PORT
+    buildCommand: pip install --upgrade pip && pip install -r requirements-prod.txt
+    startCommand: bash scripts/render_start.sh
     healthCheckPath: /healthz
     envVars:
       - key: DATABASE_URL
@@ -69,7 +69,7 @@ services:
     runtime: python
     region: oregon
     schedule: "0 6 * * *"
-    buildCommand: pip install -r requirements-prod.txt
+    buildCommand: pip install --upgrade pip && pip install -r requirements-prod.txt
     startCommand: python phases/phase-1/scripts/generate_drop.py
     envVars:
       - key: DATABASE_URL
@@ -90,7 +90,7 @@ services:
     runtime: python
     region: oregon
     schedule: "0 */6 * * *"
-    buildCommand: pip install -r requirements-prod.txt
+    buildCommand: pip install --upgrade pip && pip install -r requirements-prod.txt
     startCommand: python phases/phase-2/scripts/llm_prewarm.py
     envVars:
       - key: DATABASE_URL
@@ -114,7 +114,7 @@ services:
     runtime: python
     region: oregon
     schedule: "30 */6 * * *"
-    buildCommand: pip install -r requirements-prod.txt
+    buildCommand: pip install --upgrade pip && pip install -r requirements-prod.txt
     startCommand: python phases/phase-3/scripts/candidate_prewarm.py
     envVars:
       - key: DATABASE_URL
