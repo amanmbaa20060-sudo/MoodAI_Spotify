@@ -1,0 +1,23 @@
+# MoodAI Product Specification (Grad Project)
+
+## Product Goal
+Help users discover new music based on emotional intent. Reduce decision fatigue with AI-generated reasons for every recommendation.
+
+## Target Platform
+- Primary: Mobile Web (375-430px)
+- Secondary: Desktop Web (960px centered)
+
+## Visual Direction
+- **Theme**: Dark Mode
+- **Background**: #0F172A
+- **Surface**: #111827
+- **Accent**: Emerald Green (#22C55E)
+- **Radius**: 12-16px for cards/album art; Pill for chips
+
+## Core Screens
+1. Home (Discovery Gateway)
+2. Artist Search (Visual Browse)
+3. Mood Feedback (Transitions)
+4. Feedback Modals ("Heard it before")
+5. Component Library
+6. Empty/Error States

@@ -19,11 +19,11 @@ def _parse_url(url: str) -> dict[str, Any]:
     }
 
 
-def connect(url: str):
+def connect(url: str, connect_timeout: int = 10):
     try:
         import psycopg
 
-        return psycopg.connect(url)
+        return psycopg.connect(url, connect_timeout=connect_timeout)
     except ImportError:
         import pg8000
 
@@ -34,12 +34,22 @@ def connect(url: str):
             host=params["host"],
             port=params["port"],
             database=params["database"],
+            timeout=connect_timeout,
         )
 
 
+def database_is_available(url: str, connect_timeout: int = 3) -> bool:
+    try:
+        with get_connection(url, connect_timeout=connect_timeout) as conn, conn.cursor() as cur:
+            cur.execute("SELECT 1")
+        return True
+    except Exception:
+        return False
+
+
 @contextmanager
-def get_connection(url: str) -> Iterator[Any]:
-    conn = connect(url)
+def get_connection(url: str, connect_timeout: int = 10) -> Iterator[Any]:
+    conn = connect(url, connect_timeout=connect_timeout)
     try:
         yield conn
     finally:

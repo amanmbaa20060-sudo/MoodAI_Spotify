@@ -8,6 +8,7 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI, Query
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT) not in sys.path:
@@ -16,6 +17,7 @@ if str(ROOT) not in sys.path:
 from phases.common.config import get_settings  # noqa: E402
 
 from .candidate_prewarm import CandidatePrewarmService
+from .demo_repository import DemoRepository, should_use_demo_mode
 from .dependencies import get_user_id
 from .drop_sharding import user_partition, users_for_partition
 from .edge_cache import HomeEdgeCache
@@ -49,7 +51,8 @@ from .token_budget import TokenBudgetService
 
 def build_services():
     settings = get_settings()
-    repository = Phase3Repository(settings.database_url)
+    demo_mode = should_use_demo_mode(settings.database_url)
+    repository = DemoRepository() if demo_mode else Phase3Repository(settings.database_url)
     ranker = MoodAwareRanker()
     novelty = NoveltyFilterService(repository)
     token_budget = TokenBudgetService(repository, settings.llm_token_budget_per_day)
@@ -86,6 +89,7 @@ def build_services():
         home_cache,
         candidate_prewarm,
         token_budget,
+        demo_mode,
     )
 
 
@@ -105,6 +109,7 @@ def create_app(services: tuple | None = None) -> FastAPI:
             home_cache,
             candidate_prewarm,
             token_budget,
+            demo_mode,
         ) = build_services()
     else:
         (
@@ -121,9 +126,11 @@ def create_app(services: tuple | None = None) -> FastAPI:
             home_cache,
             candidate_prewarm,
             token_budget,
+            demo_mode,
         ) = services
 
     app = FastAPI(title="MoodAI Phase 3 — Optimization & Scale", version="3.0.0")
+    static_dir = Path(__file__).resolve().parent.parent / "static"
     for name, value in (
         ("settings", settings),
         ("repository", repository),
@@ -138,16 +145,32 @@ def create_app(services: tuple | None = None) -> FastAPI:
         ("home_cache", home_cache),
         ("candidate_prewarm", candidate_prewarm),
         ("token_budget", token_budget),
+        ("demo_mode", demo_mode),
     ):
         setattr(app.state, name, value)
 
     @app.get("/", include_in_schema=False)
     def web_ui() -> FileResponse:
-        return FileResponse(Path(__file__).resolve().parent.parent / "static" / "index.html")
+        return FileResponse(static_dir / "index.html")
 
     @app.get("/healthz")
     def healthz() -> dict[str, str]:
-        return {"status": "ok", "phase": "3"}
+        payload = {
+            "status": "ok",
+            "phase": "3",
+            "product": "MoodAI Spotify",
+        }
+        if app.state.demo_mode:
+            payload["mode"] = "demo"
+        return payload
+
+    @app.get("/api/identity", include_in_schema=False)
+    def identity() -> dict[str, str]:
+        """Helps verify you hit MoodAI and not another local app on the same port."""
+        payload = {"product": "MoodAI Spotify", "phase": "3"}
+        if app.state.demo_mode:
+            payload["mode"] = "demo"
+        return payload
 
     @app.get("/v1/mood/suggestion", response_model=MoodSuggestionResponse)
     def mood_suggestion(user_id: str = Depends(get_user_id)) -> dict:
@@ -303,6 +326,7 @@ def create_app(services: tuple | None = None) -> FastAPI:
             "users": users[:20],
         }
 
+    app.mount("/assets", StaticFiles(directory=static_dir), name="assets")
     return app
 
 

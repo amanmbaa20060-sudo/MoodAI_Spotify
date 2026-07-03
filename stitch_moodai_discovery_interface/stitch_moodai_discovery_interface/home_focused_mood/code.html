@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>MoodAI - Focused Mood Discovery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed": "#6bff8f",
+                    "tertiary": "#ffb5ab",
+                    "surface-tint": "#4ae176",
+                    "on-error-container": "#ffdad6",
+                    "on-primary-fixed": "#002109",
+                    "on-primary": "#003915",
+                    "secondary-fixed-dim": "#7bd0ff",
+                    "surface-container-highest": "#2f372e",
+                    "on-tertiary-fixed": "#410001",
+                    "background": "#0e150e",
+                    "on-primary-container": "#004b1e",
+                    "on-secondary-container": "#00374d",
+                    "on-surface-variant": "#bccbb9",
+                    "on-tertiary-fixed-variant": "#7f2a21",
+                    "tertiary-fixed": "#ffdad5",
+                    "tertiary-container": "#ff8b7c",
+                    "outline-variant": "#3d4a3d",
+                    "surface-container-high": "#242c24",
+                    "on-secondary": "#00354a",
+                    "primary-container": "#22c55e",
+                    "on-error": "#690005",
+                    "on-secondary-fixed": "#001e2c",
+                    "inverse-on-surface": "#2a322a",
+                    "inverse-primary": "#006e2f",
+                    "surface-dim": "#0e150e",
+                    "primary": "#4be277",
+                    "surface": "#0e150e",
+                    "error-container": "#93000a",
+                    "on-tertiary-container": "#76231b",
+                    "on-primary-fixed-variant": "#005321",
+                    "outline": "#869585",
+                    "secondary-container": "#00a6e0",
+                    "on-surface": "#dce5d9",
+                    "primary-fixed-dim": "#4ae176",
+                    "tertiary-fixed-dim": "#ffb4a9",
+                    "error": "#ffb4ab",
+                    "surface-container-low": "#161d16",
+                    "on-tertiary": "#60130d",
+                    "on-secondary-fixed-variant": "#004c69",
+                    "on-background": "#dce5d9",
+                    "surface-container-lowest": "#091009",
+                    "surface-container": "#1a221a",
+                    "surface-bright": "#333b33",
+                    "inverse-surface": "#dce5d9",
+                    "surface-variant": "#2f372e",
+                    "secondary": "#7bd0ff",
+                    "secondary-fixed": "#c4e7ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-padding-desktop": "2.5rem",
+                    "stack-sm": "0.5rem",
+                    "gutter": "1.5rem",
+                    "stack-lg": "2rem",
+                    "base": "8px",
+                    "stack-md": "1rem",
+                    "container-padding-mobile": "1.25rem"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "label-caps": ["JetBrains Mono"],
+                    "caption": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0e150e;
+            color: #dce5d9;
+            -webkit-font-smoothing: antialiased;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .glass-effect {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .luminous-shadow {
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
+        }
+        .emerald-glow:hover {
+            box-shadow: 0 0 15px 2px rgba(34, 197, 94, 0.15);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-body-md overflow-x-hidden pb-24">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl">
+<div class="flex items-center justify-between px-container-padding-mobile h-16 w-full max-w-7xl mx-auto">
+<div class="flex flex-col">
+<span class="font-display-lg text-display-lg-mobile tracking-tighter text-primary">MoodAI</span>
+<span class="text-caption font-caption text-on-surface-variant -mt-1">Good evening</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a person with a creative flair, high-quality lighting, soft focus background, emphasizing a clean and premium aesthetic. The colors are muted and sophisticated, matching the dark and emerald green theme of the interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7Sw3SdLSKsHfIYn13B8LpaPMozGTpmXOz_P0OFVQWykgin537pG33b6s7zb2EILX8HUs9d_3tbCdd6bD7pl281wkjYiZjOGKNr8fFfHx9s_uKkjXslUtzx71cm_b7GzzkBnnqzTgKwL3sanX2gjhwVAJRpu_UK1UexXGO1UvTPQflEfW6GBf5cj98T7i0Pup2dxpkdha2AQUiKXa-uiASSYdCG1ldBuUAWGk93sKv2cZQJGX2JwPtXS9SkNdl80S4Tg6hOM8Kqa8"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-24 space-y-stack-lg">
+<!-- Section A: Mood Gateway -->
+<section class="px-container-padding-mobile space-y-3">
+<p class="font-label-caps text-label-caps text-on-surface-variant tracking-widest">HOW ARE YOU FEELING?</p>
+<div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
+<!-- Focused (Active) -->
+<button class="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary-container text-on-primary-container transition-all active:scale-95">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">target</span>
+<span class="font-body-sm text-body-sm font-bold">Focused</span>
+</button>
+<!-- Energised -->
+<button class="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface-container-low border border-outline-variant text-on-surface-variant hover:border-primary/50 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[20px] text-[#ff8b7c]">bolt</span>
+<span class="font-body-sm text-body-sm">Energised</span>
+</button>
+<!-- Low-key -->
+<button class="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface-container-low border border-outline-variant text-on-surface-variant hover:border-primary/50 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[20px] text-[#7bd0ff]">dark_mode</span>
+<span class="font-body-sm text-body-sm">Low-key</span>
+</button>
+<!-- Adventurous -->
+<button class="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface-container-low border border-outline-variant text-on-surface-variant hover:border-primary/50 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[20px] text-primary">explore</span>
+<span class="font-body-sm text-body-sm">Adventurous</span>
+</button>
+<!-- Nostalgic -->
+<button class="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface-container-low border border-outline-variant text-on-surface-variant hover:border-primary/50 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[20px] text-tertiary">history</span>
+<span class="font-body-sm text-body-sm">Nostalgic</span>
+</button>
+</div>
+</section>
+<!-- Section B: Your Discovery Drop (Hero Bento-ish) -->
+<section class="px-container-padding-mobile">
+<div class="bg-surface-container rounded-3xl p-6 border border-outline-variant luminous-shadow relative overflow-hidden">
+<!-- Abstract Glow Background -->
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 blur-[80px] rounded-full pointer-events-none"></div>
+<div class="relative z-10 space-y-6">
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<h2 class="font-headline-md text-headline-md text-on-surface">Your Discovery Drop</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Today • Mar 12 — 10 fresh tracks for your Focused mood</p>
+</div>
+<span class="material-symbols-outlined text-primary text-[28px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div class="space-y-4">
+<!-- Track 1 -->
+<div class="group flex items-center justify-between p-2 -mx-2 rounded-xl hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Abstract minimalist album art for electronic music, featuring geometric lines and deep green emerald hues against a midnight black background. Sophisticated, tech-focused aesthetic that feels modern and calm for a deep work focus session." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMGCTxw0is0jJa5qjqRhdX2Bw-SULz988aeyGRXVu6RFMnjFuqZLIVkETCdBs9J3ZhlbrGRW0Dmyhtq9pPZNIWM4VV99lPD3KQK4KWybsYzckRKZBY_cTCvqKTehusiG3-7Z70PEeX9jueG0_32SCBSd-53SQNulHcyigreASzRDWa__sqbRL5E6ROQZtUkBRwwTLvU30WlvpRwyj5nygLDhVCyQvrdCvoSsn87dwUjaFYH6D9q0c2MUEVntqEwbo2819w6reMNCs"/>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-bold text-on-surface">Recursive Patterns</span>
+<span class="text-caption font-caption text-on-surface-variant">Loomis Ambient</span>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="material-symbols-outlined text-primary text-[14px]">auto_awesome</span>
+<span class="text-[11px] font-medium text-primary uppercase tracking-wider">Steady tempo and low lyrics</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary-container active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+<!-- Track 2 -->
+<div class="group flex items-center justify-between p-2 -mx-2 rounded-xl hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Minimalist architectural photography of a concrete stairwell, captured with a cinematic eye, soft shadows, and deep green moss accents. The aesthetic is clean, industrial, and promotes a sense of structure and concentration." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWVll7aX-7dEoF7ubd-pTrkjv7rfKbdbsSrxD_QR9vwmzEVpH2RuBT9EJQI9nYQNi3JVcLZQgKn7LmfGAFV80cYGBqMr0x8FNc-VpSC9ndVKXHg0nfQ-wAoMm__YV9fQmEzdeY1hzyYIM7jK1UlD3j2h4P-NbRrePurBV9fTWPFB7PQnLHjuDNNImwZczroTSL42CCaFeIKSWILL6Tv8PGLNfHBe6iXaZMncfgDzdbwZtyjY4sQEVjD3CHEx_bS95tYxKsIzdncao"/>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-bold text-on-surface">Slate Horizon</span>
+<span class="text-caption font-caption text-on-surface-variant">Mono Architect</span>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="material-symbols-outlined text-primary text-[14px]">auto_awesome</span>
+<span class="text-[11px] font-medium text-primary uppercase tracking-wider">Great for deep work</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary-container active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+<!-- Track 3 -->
+<div class="group flex items-center justify-between p-2 -mx-2 rounded-xl hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Microscopic liquid photography showing oil droplets in water, illuminated with emerald green and cyan lights. Creating a sense of fluid movement and organic focus, ideal for a modern chill-out music vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbNQ-TejESVc-tgKpEbr7UnSeTEsxUr8LGh0ZCmFjRD8aSYZN8TCnFgaQTg4Lkm_LjgODA_lEG7FHKJgOiM9I0K1Yun11I9HanbQY56zRDix9iuMzEhEgLEE-tUPppKb-W-hoFU45TmnPZ4aCYyKwAav_PmkxOgOILYNjp5p1ytE0Bzjjt3jJJQmdBfUhRriYu5i5bUURLheDVxkIO_J81lPTVQbahtShPYG3Wl7EH1Q-P9PSLdImL0F543l4tltzwePnQAeD7nno"/>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-bold text-on-surface">Neural Drift</span>
+<span class="text-caption font-caption text-on-surface-variant">Synapse Duo</span>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="material-symbols-outlined text-primary text-[14px]">auto_awesome</span>
+<span class="text-[11px] font-medium text-primary uppercase tracking-wider">Consistent rhythmic flow</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary-container active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+<div class="pt-2 border-t border-outline-variant flex justify-center">
+<button class="text-caption font-label-caps text-on-surface-variant hover:text-primary transition-colors">HEARD IT BEFORE</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section C: Fresh Picks Carousel -->
+<section class="space-y-4">
+<div class="px-container-padding-mobile flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md">Fresh Picks</h3>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+<div class="flex gap-gutter overflow-x-auto hide-scrollbar px-container-padding-mobile snap-x">
+<!-- Card 1 -->
+<div class="flex-shrink-0 w-64 snap-start group cursor-pointer">
+<div class="aspect-square rounded-2xl overflow-hidden mb-3 border border-outline-variant group-hover:scale-[1.02] transition-transform duration-300">
+<img class="w-full h-full object-cover" data-alt="Cinematic macro shot of a single green leaf with dew drops, extremely shallow depth of field, dark forest background. The lighting is ethereal and mysterious, matching a premium music discovery experience for focused listening." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD95LX2tg0OeyPck_aid-m8WvRn6-JHTHamRWyC1Uyf4boPtgUjBgQ9OKSCSO6vC4hmx_KMBclKg3RB_yl519hd0d3sWNQ71_2jRjKBhwLU1MDG945V7aix2k2LT8Me5pJejoKxIQfxaEnJm0kI0kM179Ro5KHcgKqqnWDPjOcOmopV0sIVAezr_xZUIfoHXb7cPw2561Q1aJ5NQOeBUjigugiDmf2PitAGxS7w3JiUdeQRJBuf31kxv_5rN5k3zYWTKP5KRGF4u2M"/>
+</div>
+<h4 class="font-body-md text-body-md font-bold text-on-surface truncate">Silent Signal</h4>
+<p class="text-caption font-caption text-on-surface-variant truncate">Echo Park</p>
+</div>
+<!-- Card 2 -->
+<div class="flex-shrink-0 w-64 snap-start group cursor-pointer">
+<div class="aspect-square rounded-2xl overflow-hidden mb-3 border border-outline-variant group-hover:scale-[1.02] transition-transform duration-300">
+<img class="w-full h-full object-cover" data-alt="Minimalist abstract art with overlapping circular gradients of deep forest green and charcoal grey. Soft grainy texture, very sleek and professional look for a modern music app card." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4yhqCDbkGmQ-FmxMmi5ELV5qhw9G0Bv0nO0w6S4q92jSNbvNz-1kHo3CRGb_wps33iohhswN1t2eaVJQQU5sCwt1hMidVvmzUGxByRJsdxE6KMkN3kfy7yf78WjRyLu81kvpy7DETcoSAQbmDxuQheCSYi0__OAAB5vi2sUC3joKj_IZq0IYtmywQcERriRDlYunLyqOVBHl-_CE_MKiJFu5DnonJHasY1kpMIqWOyEsDUnHy23QTxGGcnkqbZZsDFLIL70FlhrY"/>
+</div>
+<h4 class="font-body-md text-body-md font-bold text-on-surface truncate">Vortex Mind</h4>
+<p class="text-caption font-caption text-on-surface-variant truncate">Static Pulse</p>
+</div>
+<!-- Card 3 -->
+<div class="flex-shrink-0 w-64 snap-start group cursor-pointer">
+<div class="aspect-square rounded-2xl overflow-hidden mb-3 border border-outline-variant group-hover:scale-[1.02] transition-transform duration-300">
+<img class="w-full h-full object-cover" data-alt="High-speed photograph of ink swirling in dark water, captured with vibrant green light trails. Dramatic and focused energy, emphasizing a sophisticated late-night aesthetic for creative work playlists." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlXK-dRVE5HTr1VSh5GQatUUysJyMnt60rvDJsf5b2KkzdEgXpKBqyrXB6Ws1x2B_IlUdLm4nbPlrrQKOHGFIA4wXFzX3BvNIMy9aJFnbsfWCF7WBWEhOer2T26HKkvlcwcHvsSm50rkseKSncH22t8ol3wue_hX1769A_PaHQus6PUNBXCFVdOmbnocA-k7veIvXcV1QFrHTuE7L7QGhc5uskWF_37YvFC1NAk3DCYugmF-Vy-BoZYaQhhi5TuxRzOVGvJzggY9E"/>
+</div>
+<h4 class="font-body-md text-body-md font-bold text-on-surface truncate">Deep Logic</h4>
+<p class="text-caption font-caption text-on-surface-variant truncate">Binary Sound</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Navigation Shell -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-lg border-t border-outline-variant shadow-lg py-3 px-6 pb-safe">
+<div class="flex justify-around items-center max-w-lg mx-auto">
+<!-- Home (Active) -->
+<button class="flex flex-col items-center justify-center text-primary font-bold active:scale-90 transition-all">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-caps text-[10px] mt-1 tracking-tight">Home</span>
+</button>
+<!-- Search -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary-fixed-dim active:scale-90 transition-all">
+<span class="material-symbols-outlined text-[24px]">search</span>
+<span class="font-label-caps text-[10px] mt-1 tracking-tight">Search</span>
+</button>
+<!-- Library -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary-fixed-dim active:scale-90 transition-all">
+<span class="material-symbols-outlined text-[24px]">library_music</span>
+<span class="font-label-caps text-[10px] mt-1 tracking-tight">Library</span>
+</button>
+</div>
+</nav>
+<!-- Floating Action Button (FAB) - Contextual Contextual -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary-container rounded-full flex items-center justify-center shadow-2xl active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">headphones</span>
+</button>
+<script>
+        // Simple Micro-interaction: Active mood chip toggle
+        const moodButtons = document.querySelectorAll('.mood-gateway-chip');
+        moodButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                moodButtons.forEach(b => {
+                    b.classList.remove('bg-primary-container', 'text-on-primary-container');
+                    b.classList.add('bg-surface-container-low', 'border', 'border-outline-variant', 'text-on-surface-variant');
+                });
+                btn.classList.add('bg-primary-container', 'text-on-primary-container');
+                btn.classList.remove('bg-surface-container-low', 'border', 'border-outline-variant', 'text-on-surface-variant');
+            });
+        });
+
+        // Atmospheric Scroll behavior
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                header.classList.add('shadow-md');
+            } else {
+                header.classList.remove('shadow-md');
+            }
+        });
+    </script>
+</body></html>

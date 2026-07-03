@@ -23,12 +23,20 @@ psql $DATABASE_URL -f phases/phase-2/sql/schema.sql
 psql $DATABASE_URL -f phases/phase-3/sql/schema.sql
 ```
 
-## Run
+## Run (local UI)
+
+**Use port 8010** — port `8000` is often taken by other projects (e.g. AI Travel Planner).
 
 ```bash
+# From repo root (recommended)
+python scripts/run_dev.py
+
+# Or manually
 cd phases/phase-3
-uvicorn app.main:create_app --factory --reload
+uvicorn app.main:create_app --factory --reload --host 127.0.0.1 --port 8010
 ```
+
+Open **http://127.0.0.1:8010/** (not `:8000`). Verify: `GET /healthz` → `"product": "MoodAI Spotify"`.
 
 ## Jobs
 

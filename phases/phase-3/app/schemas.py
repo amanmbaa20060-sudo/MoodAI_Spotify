@@ -45,7 +45,7 @@ class HomeResponse(BaseModel):
     user_id: str
     mood_options: list[str]
     active_mood: str
-    feature_flags: dict[str, bool]
+    feature_flags: dict[str, bool | str]
     modules: list[HomeModule]
 
 

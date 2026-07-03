@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid #1E293B;
+        }
+        .artist-glow:hover {
+            box-shadow: 0 0 20px -5px rgba(34, 197, 94, 0.3);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "primary-fixed": "#6bff8f",
+                "tertiary": "#ffb5ab",
+                "surface-tint": "#4ae176",
+                "on-error-container": "#ffdad6",
+                "on-primary-fixed": "#002109",
+                "on-primary": "#003915",
+                "secondary-fixed-dim": "#7bd0ff",
+                "surface-container-highest": "#2f372e",
+                "on-tertiary-fixed": "#410001",
+                "background": "#0e150e",
+                "on-primary-container": "#004b1e",
+                "on-secondary-container": "#00374d",
+                "on-surface-variant": "#bccbb9",
+                "on-tertiary-fixed-variant": "#7f2a21",
+                "tertiary-fixed": "#ffdad5",
+                "tertiary-container": "#ff8b7c",
+                "outline-variant": "#3d4a3d",
+                "surface-container-high": "#242c24",
+                "on-secondary": "#00354a",
+                "primary-container": "#22c55e",
+                "on-error": "#690005",
+                "on-secondary-fixed": "#001e2c",
+                "inverse-on-surface": "#2a322a",
+                "inverse-primary": "#006e2f",
+                "surface-dim": "#0e150e",
+                "primary": "#4be277",
+                "surface": "#0e150e",
+                "error-container": "#93000a",
+                "on-tertiary-container": "#76231b",
+                "on-primary-fixed-variant": "#005321",
+                "outline": "#869585",
+                "secondary-container": "#00a6e0",
+                "on-surface": "#dce5d9",
+                "primary-fixed-dim": "#4ae176",
+                "tertiary-fixed-dim": "#ffb4a9",
+                "error": "#ffb4ab",
+                "surface-container-low": "#161d16",
+                "on-tertiary": "#60130d",
+                "on-secondary-fixed-variant": "#004c69",
+                "on-background": "#dce5d9",
+                "surface-container-lowest": "#091009",
+                "surface-container": "#1a221a",
+                "surface-bright": "#333b33",
+                "inverse-surface": "#dce5d9",
+                "surface-variant": "#2f372e",
+                "secondary": "#7bd0ff",
+                "secondary-fixed": "#c4e7ff"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "container-padding-desktop": "2.5rem",
+                "stack-sm": "0.5rem",
+                "gutter": "1.5rem",
+                "stack-lg": "2rem",
+                "base": "8px",
+                "stack-md": "1rem",
+                "container-padding-mobile": "1.25rem"
+            },
+            "fontFamily": {
+                "body-lg": ["Inter"],
+                "label-caps": ["JetBrains Mono"],
+                "caption": ["Inter"],
+                "display-lg": ["Inter"],
+                "display-lg-mobile": ["Inter"],
+                "body-md": ["Inter"],
+                "body-sm": ["Inter"],
+                "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background selection:bg-primary/30 min-h-screen font-body-md overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl">
+<div class="flex items-center justify-between px-container-padding-mobile h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer active:scale-95 transition-transform" data-icon="menu">menu</span>
+<h1 class="font-display-lg text-display-lg-mobile tracking-tighter text-primary">MoodAI</h1>
+</div>
+<div class="w-10 h-10 rounded-full border border-outline-variant overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="A professional profile headshot of a creative individual, soft neon green rim lighting against a deep charcoal background, high-end digital photography style, sharp focus on eyes, minimalist aesthetic consistent with a premium music discovery application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7qebtkD0Zg16d5k8DJDZT3K2XKuX8BlteFqByuBXSZ4b-SEv4YdP7oA0Xfu5UwgmJWTvptatSpP8rcoMbUYvgrpKAlYScM1UJqYeyz0IIlEV_RgZT1G44UVIhjIXtBFDgWkuWGfOGL9yzSgByCw2DWfMy9L2ClcCjQKqgeiC_2hrDeax8RqEt_HoOmEfShxmJ5G2VyA0PK24j-3s04znvB7aDwwkxoIEjKv7xj_EmcaTfe_ohP3_ywWVypxCIRpLw0ONHGhAsnpw"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-32 px-container-padding-mobile max-w-7xl mx-auto">
+<!-- Search Section -->
+<div class="relative mb-stack-lg group">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant group-focus-within:text-primary transition-colors" data-icon="search">search</span>
+</div>
+<input class="w-full h-14 pl-12 pr-6 rounded-full bg-surface-container-low border border-outline-variant text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-body-md shadow-inner" placeholder="Search artists..." type="text"/>
+</div>
+<!-- Section Title & Filter Chips -->
+<div class="flex flex-wrap items-center justify-between mb-gutter gap-4">
+<h2 class="font-headline-md text-headline-md-mobile text-on-surface">Top Results</h2>
+<div class="flex gap-2">
+<button class="px-4 py-1.5 rounded-full border border-primary bg-primary/10 text-primary font-label-caps text-label-caps">Artists</button>
+<button class="px-4 py-1.5 rounded-full border border-outline-variant hover:border-on-surface-variant text-on-surface-variant font-label-caps text-label-caps transition-colors">Albums</button>
+<button class="px-4 py-1.5 rounded-full border border-outline-variant hover:border-on-surface-variant text-on-surface-variant font-label-caps text-label-caps transition-colors">Moods</button>
+</div>
+</div>
+<!-- 2-Column Artist Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-gutter">
+<!-- Artist Card 1 -->
+<div class="glass-card artist-glow p-4 rounded-xl flex flex-col items-center text-center transition-all duration-300 group cursor-pointer">
+<div class="w-[120px] h-[120px] rounded-full overflow-hidden border-2 border-outline-variant group-hover:border-primary transition-colors mb-4 relative">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-105" data-alt="Close-up artistic portrait of an indie female musician with messy neon-tinted hair, dramatic shadow lighting in a dark music studio setting, sophisticated color palette of deep greens and blacks, premium modernist photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLEZkuu9PFIIGPB0whPEz8VYOJUuhuuPhveVWRGVyca_XS-V9k3UEllaHDnX04JB8s0pz7OtcEscuDb2glUgoO5ikVrCwCXfiz_jfVqdUO8dbK6s2zGIGCHXs_bsECY4aIB9RHfp9jszFan7V1rkMHbecBT6DEzocGZV6ae_Kn6bzYPEUrlysvIOygJQLE8zukUYgSiUh8e33D0b_xiwrIVjiCYJOrKe3Ma-0Snbd0CgWU4vLZ9_irlbSlPrwgUndkMeZtVyA-XIQ"/>
+</div>
+<h3 class="font-headline-md text-body-lg text-on-surface mb-1 truncate w-full">Elara Vance</h3>
+<p class="font-caption text-caption text-on-surface-variant mb-3">24 tracks in catalog</p>
+<span class="px-3 py-1 bg-surface-container-highest text-primary-fixed rounded-full font-label-caps text-[10px] uppercase tracking-widest border border-outline-variant">Indie Rock</span>
+</div>
+<!-- Artist Card 2 -->
+<div class="glass-card artist-glow p-4 rounded-xl flex flex-col items-center text-center transition-all duration-300 group cursor-pointer">
+<div class="w-[120px] h-[120px] rounded-full overflow-hidden border-2 border-outline-variant group-hover:border-primary transition-colors mb-4 relative">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-105" data-alt="Portrait of an electronic music producer wearing sleek modern headphones, blue and green ambient studio lighting reflecting off skin, cinematic high-fidelity depth of field, minimalist tech-aesthetic background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbYTFtfpIKiEALENuC5pF1e30PpFxUy8vdpSV9T7PQAxVPlGdNE-hk5JiR0BvHT-22_UlEA-gQ6sGCwoIR2_ZZBL05fDtYsUXgIZPZbsoZYA-hRTLAw9MwDw00LjQe8dAjgLvJj10gs2BOy1gro_QlCO1JKxkPY0BTodHag7NEbJz9-92baRhuqWkBajuMbYyKYuAFXxnXXdvaobPcu0ptqPcPfMsx2wTQq7KIfzA2rPl1OQNgaHaadEIvEQCNgtNw9B4Fd6DXEdc"/>
+</div>
+<h3 class="font-headline-md text-body-lg text-on-surface mb-1 truncate w-full">System Echo</h3>
+<p class="font-caption text-caption text-on-surface-variant mb-3">42 tracks in catalog</p>
+<span class="px-3 py-1 bg-surface-container-highest text-primary-fixed rounded-full font-label-caps text-[10px] uppercase tracking-widest border border-outline-variant">Electronic</span>
+</div>
+<!-- Artist Card 3 -->
+<div class="glass-card artist-glow p-4 rounded-xl flex flex-col items-center text-center transition-all duration-300 group cursor-pointer">
+<div class="w-[120px] h-[120px] rounded-full overflow-hidden border-2 border-outline-variant group-hover:border-primary transition-colors mb-4 relative">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-105" data-alt="Stylized portrait of a jazz saxophonist in a moody late-night lounge, warm amber highlights contrasting with the cool deep emerald interface tones, high-contrast black and white photography style with grain." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDje-qo00Kt8G9GN0ie2VJqm1DAtG7lw5PCsiDsOjBECwoSURJn7HQ-tVH-SyDq5oW-YQnLF9Nl9TIENKlpjBwPhFCnyChvqE_5bNosTBF4wj2J9o5nLQwCqlHphq6AMNYGzSfiy3QGSgLXEPEdVKBm2jerod6hSM9wYu6orzoFoujYpBYazi6iMf1IleTyQ-8d--h25b4rteX2cQRDuDX63G8mw_1v7EtahCbIQnbt8oil44Nh_SDusgEh9rHJ-KcLrLaXdrxyuZo"/>
+</div>
+<h3 class="font-headline-md text-body-lg text-on-surface mb-1 truncate w-full">Miles Indigo</h3>
+<p class="font-caption text-caption text-on-surface-variant mb-3">18 tracks in catalog</p>
+<span class="px-3 py-1 bg-surface-container-highest text-primary-fixed rounded-full font-label-caps text-[10px] uppercase tracking-widest border border-outline-variant">Modern Jazz</span>
+</div>
+<!-- Artist Card 4 -->
+<div class="glass-card artist-glow p-4 rounded-xl flex flex-col items-center text-center transition-all duration-300 group cursor-pointer">
+<div class="w-[120px] h-[120px] rounded-full overflow-hidden border-2 border-outline-variant group-hover:border-primary transition-colors mb-4 relative">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-105" data-alt="Abstract portrait of a synth-wave artist, geometric light patterns projected onto face, vibrant emerald and teal highlights, dark sleek modern atmosphere, premium editorial music magazine style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSDcO0cIZflCFLgx_49G-WQl8hM1UywPESlvThvxzzRaD-nuONkRQK5RytTJ7hLpzq0zwcBMxVY46Y4LQOGQqNtoc15UIB2AcceBK-mbjpYNQHYelkfGWz-xFn5I_QI-uvBLEKpNv00GdrsN04IIi9muzyTaHvPlQjWPV0e3znLFs14fmLxaNMvolp5pwNH-GNO6o-iVBjlrmueVzz-Ol1HRdLOO5kQKfJK_m2JYzHNyyK2IvcxLX3Z83kLMiBFubf5ZcxlRatiyQ"/>
+</div>
+<h3 class="font-headline-md text-body-lg text-on-surface mb-1 truncate w-full">Nova Pulse</h3>
+<p class="font-caption text-caption text-on-surface-variant mb-3">36 tracks in catalog</p>
+<span class="px-3 py-1 bg-surface-container-highest text-primary-fixed rounded-full font-label-caps text-[10px] uppercase tracking-widest border border-outline-variant">Synth Wave</span>
+</div>
+<!-- Artist Card 5 -->
+<div class="glass-card artist-glow p-4 rounded-xl flex flex-col items-center text-center transition-all duration-300 group cursor-pointer">
+<div class="w-[120px] h-[120px] rounded-full overflow-hidden border-2 border-outline-variant group-hover:border-primary transition-colors mb-4 relative">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-105" data-alt="A portrait of a minimalist folk singer, natural soft window lighting, dark charcoal textured wall in background, elegant composition, muted natural tones, high resolution studio shot." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3sgglRMZpGa-08JCsGwhaLw1-quUnBg6efF1aSb0XlWzLXPsLMTDrykhTCJqvGcTEoh2lTsy-LPRVm0jFttFKgKy61ovyc74qTZKSBVE28fpJWHJP-RPtQacjjORVK4n8VZxTF4mAK6skpdlM_KCR6cUGRKv5Krba-NMx1oY18Nz-iyoYvs7Kqz2i3z_m_QpmdoIMnnIO3Kz561Keseg7hCUqREOCyf2a4q67CoW-oN6Yb3A8PGUp-RcdQ9wxqFe8GL8LPIePCwU"/>
+</div>
+<h3 class="font-headline-md text-body-lg text-on-surface mb-1 truncate w-full">Lyra Oak</h3>
+<p class="font-caption text-caption text-on-surface-variant mb-3">12 tracks in catalog</p>
+<span class="px-3 py-1 bg-surface-container-highest text-primary-fixed rounded-full font-label-caps text-[10px] uppercase tracking-widest border border-outline-variant">Neo-Folk</span>
+</div>
+<!-- Artist Card 6 -->
+<div class="glass-card artist-glow p-4 rounded-xl flex flex-col items-center text-center transition-all duration-300 group cursor-pointer">
+<div class="w-[120px] h-[120px] rounded-full overflow-hidden border-2 border-outline-variant group-hover:border-primary transition-colors mb-4 relative">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-105" data-alt="A cinematic portrait of a classical pianist, soft light hitting ivory keys and hands in foreground, blurred dark background with subtle green reflections, sophisticated and calm atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDlzsntKPMNR1uwAOLuiilwzP2gWjn4BkE_rEUZf9Zp2u9RysCDSDZ1TgFZ7w6V_lpJoBWx9tK_Yh7dmlzVz6lqtTRhNb2M5V8se7jpQqlYl58NA_M_6QHRX0wXuO5Sno1QpLqG1tAg8ij3p8enSenZfm95PWV1buyDm9Y4iT80dQKFsUuSbdlwgsy6Cri4T6e3vWRhriwLH5sVl1YkCFTurKfras5oJqryDfxEfgPkas00iHc-7EExjF4khzV59IJw8WcMTzFg_g"/>
+</div>
+<h3 class="font-headline-md text-body-lg text-on-surface mb-1 truncate w-full">Julian Kross</h3>
+<p class="font-caption text-caption text-on-surface-variant mb-3">55 tracks in catalog</p>
+<span class="px-3 py-1 bg-surface-container-highest text-primary-fixed rounded-full font-label-caps text-[10px] uppercase tracking-widest border border-outline-variant">Classical</span>
+</div>
+</div>
+<!-- Atmospheric Background Element -->
+<div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center py-3 px-6 pb-safe bg-surface-container-lowest/90 backdrop-blur-lg border-t border-outline-variant shadow-lg z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary-fixed-dim transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-label-caps text-label-caps">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-bold transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="search" style="font-variation-settings: 'FILL' 1;">search</span>
+<span class="font-label-caps text-label-caps">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary-fixed-dim transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="library_music">library_music</span>
+<span class="font-label-caps text-label-caps">Library</span>
+</a>
+</nav>
+<!-- Quick Player Mini-Bar (Floating) -->
+<div class="fixed bottom-24 left-1/2 -translate-x-1/2 w-[calc(100%-2.5rem)] max-w-lg glass-card rounded-2xl p-3 flex items-center gap-4 z-40 shadow-2xl">
+<div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Album art for a lo-fi hip hop track, featuring a minimalist rainy city scene through a window, emerald green lighting accents, digital painting style, calm and moody aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRl12vCbegtYOha9TQVlU-vaTBm8NFeQBwmjY_WNGD0MPgk-gJoc83oxR-19aIKbwDiFcY-tmF5ZvwZqamaKaMvLdkU-hab3ODHyPj9EhRV6VsvjJ5rqpcL6inT9LgcfSp9iLzH2lnEOHlv3gPJT9gZ75dprBZoIx1uyRm-yV5Jp8Y9m8I4ued5naZL3ZI5DS0dFsK_gBpw8egGAqoTd8RxNMXgpoGM0BhbQbiYBdlKU7ZWodlJcxfKPCcHJVriOYvAGx-t8Wq-dg"/>
+</div>
+<div class="flex-grow min-w-0">
+<p class="font-body-sm text-on-surface truncate">Late Night Echoes</p>
+<p class="font-caption text-on-surface-variant text-[10px] truncate">System Echo</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="material-symbols-outlined text-on-surface hover:text-primary transition-colors" data-icon="skip_previous">skip_previous</button>
+<button class="w-10 h-10 rounded-full bg-primary text-background flex items-center justify-center hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<button class="material-symbols-outlined text-on-surface hover:text-primary transition-colors" data-icon="skip_next">skip_next</button>
+</div>
+</div>
+<script>
+        // Simple interactive script for search visual feedback
+        const searchInput = document.querySelector('input[type="text"]');
+        const searchIcon = document.querySelector('[data-icon="search"]');
+
+        searchInput.addEventListener('focus', () => {
+            searchIcon.style.color = '#4be277'; // theme primary
+        });
+
+        searchInput.addEventListener('blur', () => {
+            searchIcon.style.color = '#bccbb9'; // theme on-surface-variant
+        });
+
+        // Hover effect for artist cards using JS to handle multi-step animation if needed
+        const cards = document.querySelectorAll('.glass-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const img = card.querySelector('img');
+                if(img) img.style.transform = 'scale(1.1)';
+            });
+            card.addEventListener('mouseleave', () => {
+                const img = card.querySelector('img');
+                if(img) img.</script></body></html>

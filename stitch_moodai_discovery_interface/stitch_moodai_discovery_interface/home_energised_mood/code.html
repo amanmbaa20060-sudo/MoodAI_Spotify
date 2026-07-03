@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MoodAI - Energised Mood</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(30, 41, 59, 0.5);
+        }
+        .energised-glow {
+            box-shadow: 0 0 20px -5px rgba(107, 255, 143, 0.3);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl">
+<div class="flex items-center justify-between px-container-padding-mobile h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-display-lg text-display-lg-mobile tracking-tighter text-primary">MoodAI</h1>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a young creative professional with short hair, wearing a minimalist black turtleneck. The lighting is dramatic and moody, coming from one side to create deep shadows, consistent with a high-end tech aesthetic. The background is a clean, dark slate color with a subtle soft-focus texture. The overall feel is premium, focused, and sophisticated." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFCtbGOmeqT9d78-p1kYXX13AMgMqIEyxsP3Q1K-h0FibjHUSg11JhYMCtmjPNTBuTjGtkqKSQwL7KS-WDq8jJw42aUD5um1GGhL7Tc-Aima8PM-wJP63SatwUz36WKrRR_QIgnTswpaFNZHydpMeoPFmiV9rbtY7SV6hUsnvHQiP9TPj_TUGtE-SMX67pgZ6qJi1puDwK2iwZKzZlJDocIhecifluiHUnGGjwXBINCTATWNVp1C4WPIceG4Kl_TjpF9OEWzPNmQQ"/>
+</div>
+</div>
+</header>
+<main class="pt-20 pb-32 px-container-padding-mobile max-w-7xl mx-auto">
+<!-- Mood Selector Shell -->
+<section class="mb-stack-lg">
+<h2 class="font-headline-md text-headline-md mb-stack-md">How are you feeling?</h2>
+<div class="flex gap-stack-sm overflow-x-auto hide-scrollbar pb-2">
+<!-- Mood Chips -->
+<button class="px-5 py-2 rounded-full border border-outline-variant bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps whitespace-nowrap hover:border-primary transition-colors">CALM</button>
+<button class="px-5 py-2 rounded-full border border-primary-fixed bg-primary-container/20 text-primary-fixed font-label-caps text-label-caps whitespace-nowrap transition-all energised-glow scale-105">ENERGISED</button>
+<button class="px-5 py-2 rounded-full border border-outline-variant bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps whitespace-nowrap hover:border-primary transition-colors">FOCUSED</button>
+<button class="px-5 py-2 rounded-full border border-outline-variant bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps whitespace-nowrap hover:border-primary transition-colors">MELANCHOLY</button>
+<button class="px-5 py-2 rounded-full border border-outline-variant bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps whitespace-nowrap hover:border-primary transition-colors">CREATIVE</button>
+</div>
+</section>
+<!-- Featured Discovery (Bento Style) -->
+<section class="mb-stack-lg">
+<div class="mb-stack-md">
+<h2 class="font-headline-md text-headline-md">Discovery Drop</h2>
+<p class="text-on-surface-variant text-body-sm">10 high-energy tracks for your Energised mood</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Primary Track (Bento Large) -->
+<div class="md:col-span-8 group relative overflow-hidden rounded-xl aspect-[16/10] bg-surface-container shadow-lg border border-outline-variant">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A high-energy cinematic wide shot of a modern music festival stage at night with intense neon green and electric yellow laser beams cutting through a hazy atmosphere. The silhouettes of a dense crowd are visible in the foreground, with hands raised in excitement. The lighting is vibrant, contrasty, and evokes a feeling of intense rhythmic energy and digital motion. The color palette is dominated by deep blacks and bright acid greens." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5xhK4v5TW4XDd8KsUt1XXpb4HurfFpddVtfAMYBNi9RkNy3qa9zU3reJNE7mGS8KnMT7o6kYAPTj5hhR00Y6iXYVwM733qDFrIE0rxtEKPQ2ENjBc5dktn-76OHdD2PS6xdHh_Uoxoj1MR3QW6Pji9gn6SJK2pG3U0k0oQwtOKmRXThg9SgNdcqKZIAX9WGyKKS0TpOcjwDuie5SzBW3Jae7_wXFGU6rfynoGtLKsaRVdERNx1q1zjPiEC5VCbD4lExyrYkEK9qs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent"></div>
+<div class="absolute bottom-0 p-stack-lg w-full flex justify-between items-end">
+<div>
+<span class="inline-block px-2 py-1 mb-2 bg-primary-fixed text-on-primary-fixed font-label-caps text-[10px] rounded">FEATURED SELECTION</span>
+<h3 class="font-display-lg text-display-lg-mobile text-on-surface">Hyper-Drive 2049</h3>
+<p class="text-primary-fixed font-body-sm max-w-md">High BPM and driving bass — perfect for a morning boost</p>
+</div>
+<button class="w-16 h-16 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center shadow-2xl active:scale-90 transition-transform energised-glow">
+<span class="material-symbols-outlined scale-125" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+<!-- Secondary Track (Bento Vertical) -->
+<div class="md:col-span-4 grid grid-rows-2 gap-gutter">
+<div class="bg-surface-container rounded-xl p-stack-md border border-outline-variant hover:bg-surface-container-high transition-colors group cursor-pointer">
+<div class="flex gap-stack-md items-center mb-stack-sm">
+<div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Abstract macro photography of vibrant liquid swirls in acid green and sun-yellow, mimicking the visual representation of high-frequency sound waves. The textures are glossy and reflective, with sharp highlights that suggest rapid movement and kinetic energy. The aesthetic is futuristic and energetic, perfectly suited for an electronic music album cover." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-4vFpO8XWJtmU2CviS5NYO1P8JVZBCASo9H7h8Si-sssisPy8peBjticYdlz_MR3YgUuvRXB8r3Qg0ReJ9_vzt01mo2gH3ry7BkxpuaC88nCVD_6tGkTarK7mJZrx_iBCUnpYu2GKIm7_r0TT17UZjWyst7gHbaj45rCAVNQIaOe-DvaQUYWXRryD82f4hSx7wQ80u1lIaKEUOO397SecuSuKe0-tYvob5L_s3qwz5l3PV025Rbe0pCPeyavZXDJDXNyNeqA0aXE"/>
+</div>
+<div class="flex-grow">
+<h4 class="font-headline-md text-body-lg truncate">Kinetic Flow</h4>
+<p class="text-caption text-on-surface-variant">Synth Wave</p>
+</div>
+<button class="text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+</button>
+</div>
+<p class="text-caption text-primary-fixed/80">Driving percussive rhythms to keep the tempo high.</p>
+</div>
+<div class="bg-surface-container rounded-xl p-stack-md border border-outline-variant hover:bg-surface-container-high transition-colors group cursor-pointer">
+<div class="flex gap-stack-md items-center mb-stack-sm">
+<div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A minimalist 3D rendering of a chrome sphere being shattered by a bolt of neon green electricity against a dark, pitch-black background. The shattered fragments are captured in a high-speed frozen motion, with glowing yellow sparks flying outwards. The style is sleek, modern, and highly energetic, representing a burst of digital power." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuVs0t9kfoIa_skslKvy4r7gvGZJPsiZ2-gcG-SvdATXVcHUTAlGyOmunh25XCQNJTv-KLfcOVO8qHtVBrIFwvBDLeAwDF9z9SEkXYXilqFrTI35vXHz--dwqSKnthSkxXqsduZJpYJIfk1uDY0AICCQTbQjjQV2dCyCvLRIhTC1GPDkWd6-TxIlDY-HPbfUWz8Erlb3MMl5deQUqyVvjW-AKpm0Tkb_Gs4LrXwDGh7My9pP4MlgZB9CKcV0BPSm69TLQtbUd-j3w"/>
+</div>
+<div class="flex-grow">
+<h4 class="font-headline-md text-body-lg truncate">Power Surge</h4>
+<p class="text-caption text-on-surface-variant">Techno Core</p>
+</div>
+<button class="text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+</button>
+</div>
+<p class="text-caption text-primary-fixed/80">Aggressive bassline designed for peak performance.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Shelf Layout: Energy Boosters -->
+<section>
+<div class="flex justify-between items-center mb-stack-md">
+<h2 class="font-headline-md text-headline-md">High-Intensity Picks</h2>
+<button class="text-primary font-label-caps text-label-caps hover:underline">VIEW ALL</button>
+</div>
+<div class="flex gap-gutter overflow-x-auto hide-scrollbar pb-4 -mx-container-padding-mobile px-container-padding-mobile">
+<!-- Album Cards -->
+<div class="min-w-[160px] md:min-w-[200px] group cursor-pointer">
+<div class="relative aspect-square rounded-xl overflow-hidden mb-stack-sm border border-outline-variant">
+<img class="w-full h-full object-cover transition-transform group-hover:scale-105" data-alt="An artistic high-contrast image of a mountain peak at sunrise, where the first light hits the snow turning it into a brilliant, warm electric yellow while the rest of the peak remains in a deep, cool emerald shadow. The sky is a gradient from dark navy to bright lime green. The composition is sharp and dynamic, symbolizing a fresh morning energy boost." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrQoswwV38daO87-P-9bIJ3dM4_3WA7SshmnaO2ZlhBFQFlGIrIgA2QaiU34EyMWqWZKMVA1pcnnz33fz6OiKMGLmExeqlAbWjpqu_yCTclNq0fEYxZIM5o94U4U2tQ4xR03OHdJlrXJyFxcu5vJuzfLSsm0Rh1ZZ1_mdhzzkee4ZkYYaEpZ60GyoPFjh84PR5dQUheF3tzUyt_biNgiq4ELHVOUsre8HoFGoPCSoy1jZwhq-iQc8jMLsN776WUci6Imoi1pVkGTI"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-primary scale-150" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<h4 class="font-body-md text-on-surface truncate">Peak Performance</h4>
+<p class="text-caption text-on-surface-variant">Various Artists</p>
+</div>
+<div class="min-w-[160px] md:min-w-[200px] group cursor-pointer">
+<div class="relative aspect-square rounded-xl overflow-hidden mb-stack-sm border border-outline-variant">
+<img class="w-full h-full object-cover transition-transform group-hover:scale-105" data-alt="Creative photography of neon city lights captured with long exposure and intentional camera movement to create streaks of vibrant green and warm yellow light against a dark urban backdrop. The lights look like electric brushstrokes across a canvas, conveying a sense of rapid movement and metropolitan hustle. The aesthetic is tech-focused and highly energized." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2skVJLXeb3xx_4NUUpiCJgcxbnvPXGHJjKfGrEDI6aByspoEC2_8660BKUeyZMUyQJQImOX3S9a2VIxBxYnhz5HbYCO2ZYAitCB83jLKDmiy35LevxCpK6ncQyWXmJhozDG76jOf0uM4H3BSYdDMqsg7fMTiFeHtTNiC3wwFR9B1iVCREbKPPWbMsDOlp9a5oMaJlHWDdBtSsSIIDoRkaSzfFT47l8YQy7uHZ7TsBtXpZdOPRNfz8SeP8VGFBWHXEHi7S4wh8L7s"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-primary scale-150" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<h4 class="font-body-md text-on-surface truncate">Neon Rush</h4>
+<p class="text-caption text-on-surface-variant">The Grid</p>
+</div>
+<div class="min-w-[160px] md:min-w-[200px] group cursor-pointer">
+<div class="relative aspect-square rounded-xl overflow-hidden mb-stack-sm border border-outline-variant">
+<img class="w-full h-full object-cover transition-transform group-hover:scale-105" data-alt="Visual art representing a high-voltage circuit board glowing with intense energy. The paths on the board are illuminated in a bright, warmer green-yellow light, while the components cast long, dramatic shadows. Small particle effects of light seem to be traveling along the circuits. The overall mood is intense, technical, and full of raw digital power." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPgX2UIaf3o7mbA_UHOJBGkXXoth7JFiAmIsYnqHyOUn1WAtKxufLFspWWdbbzar2_DuCu2-USLrd1XG8wyIg75qHQkW8HlcLZl3ssy90i8ZUbGMBPMk5fO6Lc8hjYIjs5KC7BpkZwDNofrncMhgwjcpqWLkm5DNIUuxSxjq1FEBreJeFyjY5LoRZqKEsYlfUEYD0l29b9k3RD1F7hnkHz3bTXcWwLkFDx81Xz4rJTUcGx0vRG593tMJQOFkFiTG7WfwZwK8k7s2w"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-primary scale-150" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<h4 class="font-body-md text-on-surface truncate">Voltage</h4>
+<p class="text-caption text-on-surface-variant">Circuit Break</p>
+</div>
+<div class="min-w-[160px] md:min-w-[200px] group cursor-pointer">
+<div class="relative aspect-square rounded-xl overflow-hidden mb-stack-sm border border-outline-variant">
+<img class="w-full h-full object-cover transition-transform group-hover:scale-105" data-alt="High-speed photograph of a single water droplet hitting a surface, but the liquid is a glowing, luminescent green. The crown of the splash is perfectly symmetrical and detailed, with tiny droplets suspended in the air. The lighting highlights the transparency and internal glow of the liquid, creating a vibrant, energetic visual. Dark background for maximum contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxN6hXjtbdYpNUxzeFsO0RtGBVmAk-5sglWcrB33TBfafzigEsISHnTe_GYZwC5vvbiIFN255Reu3fkeD7F7JoAqU_9hOx3b4OpLqXLxYWU1imu9MggKx7aKZFmJGZhGifKsBPvVayc0vYr3C8ODGs_MO-_h4ES37WiBNvU-2ofIFL2OILJd3ggxMHzuP9W3X-WUTYy54YtQWTzLWsnGURrgBECab1ZcUnFjt-do8b3A2c-UCXgWKZHRlK1kfXlHB1XQVzzJXf3So"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-primary scale-150" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<h4 class="font-body-md text-on-surface truncate">Impact</h4>
+<p class="text-caption text-on-surface-variant">Resonance</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center py-3 px-6 pb-safe bg-surface-container-lowest/90 backdrop-blur-lg border-t border-outline-variant shadow-lg z-50">
+<!-- Home Active -->
+<a class="flex flex-col items-center justify-center text-primary font-bold active:scale-90 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-caps text-label-caps mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-all hover:text-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-caps text-label-caps mt-1">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-all hover:text-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined">library_music</span>
+<span class="font-label-caps text-label-caps mt-1">Library</span>
+</a>
+</nav>
+<!-- Floating Audio Visualizer (Subtle interaction) -->
+<div class="fixed bottom-24 right-container-padding-mobile z-40 hidden md:block">
+<div class="glass-panel p-4 rounded-2xl flex items-center gap-4 energised-glow">
+<div class="flex items-end gap-1 h-6">
+<div class="w-1 bg-primary-fixed animate-[pulse_1s_infinite]" style="height: 60%"></div>
+<div class="w-1 bg-primary-fixed animate-[pulse_0.8s_infinite]" style="height: 100%"></div>
+<div class="w-1 bg-primary-fixed animate-[pulse_1.2s_infinite]" style="height: 40%"></div>
+<div class="w-1 bg-primary-fixed animate-[pulse_0.9s_infinite]" style="height: 80%"></div>
+</div>
+<div>
+<p class="text-label-caps font-label-caps text-primary-fixed">NOW PLAYING</p>
+<p class="text-body-sm font-bold text-on-surface">Hyper-Drive 2049</p>
+</div>
+</div>
+</div>
+<script>
+        // Micro-interaction for mood chips
+        const chips = document.querySelectorAll('button.font-label-caps');
+        chips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                chips.forEach(c => {
+                    c.classList.remove('border-primary-fixed', 'bg-primary-container/20', 'text-primary-fixed', 'energised-glow', 'scale-105');
+                    c.classList.add('border-outline-variant', 'bg-surface-container-low', 'text-on-surface-variant');
+                });
+                chip.classList.add('border-primary-fixed', 'bg-primary-container/20', 'text-primary-fixed', 'energised-glow', 'scale-105');
+                chip.classList.remove('border-outline-variant', 'bg-surface-container-low', 'text-on-surface-variant');
+            });
+        });
+    </script>
+</body></html>

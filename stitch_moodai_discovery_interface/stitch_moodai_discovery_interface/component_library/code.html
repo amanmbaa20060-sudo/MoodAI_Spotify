@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(30, 41, 59, 0.5);
+        }
+        .luminous-shadow {
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
+        }
+        .emerald-glow:hover {
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+            border-color: #22C55E;
+        }
+        @keyframes eq-pulse {
+            0% { height: 4px; }
+            50% { height: 16px; }
+            100% { height: 8px; }
+        }
+        .eq-bar {
+            width: 3px;
+            background-color: currentColor;
+            border-radius: 1px;
+            animation: eq-pulse 0.6s ease-in-out infinite;
+        }
+        .eq-bar:nth-child(2) { animation-delay: 0.2s; }
+        .eq-bar:nth-child(3) { animation-delay: 0.4s; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#6bff8f",
+                        "tertiary": "#ffb5ab",
+                        "surface-tint": "#4ae176",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed": "#002109",
+                        "on-primary": "#003915",
+                        "secondary-fixed-dim": "#7bd0ff",
+                        "surface-container-highest": "#2f372e",
+                        "on-tertiary-fixed": "#410001",
+                        "background": "#0e150e",
+                        "on-primary-container": "#004b1e",
+                        "on-secondary-container": "#00374d",
+                        "on-surface-variant": "#bccbb9",
+                        "on-tertiary-fixed-variant": "#7f2a21",
+                        "tertiary-fixed": "#ffdad5",
+                        "tertiary-container": "#ff8b7c",
+                        "outline-variant": "#3d4a3d",
+                        "surface-container-high": "#242c24",
+                        "on-secondary": "#00354a",
+                        "primary-container": "#22c55e",
+                        "on-error": "#690005",
+                        "on-secondary-fixed": "#001e2c",
+                        "inverse-on-surface": "#2a322a",
+                        "inverse-primary": "#006e2f",
+                        "surface-dim": "#0e150e",
+                        "primary": "#4be277",
+                        "surface": "#0e150e",
+                        "error-container": "#93000a",
+                        "on-tertiary-container": "#76231b",
+                        "on-primary-fixed-variant": "#005321",
+                        "outline": "#869585",
+                        "secondary-container": "#00a6e0",
+                        "on-surface": "#dce5d9",
+                        "primary-fixed-dim": "#4ae176",
+                        "tertiary-fixed-dim": "#ffb4a9",
+                        "error": "#ffb4ab",
+                        "surface-container-low": "#161d16",
+                        "on-tertiary": "#60130d",
+                        "on-secondary-fixed-variant": "#004c69",
+                        "on-background": "#dce5d9",
+                        "surface-container-lowest": "#091009",
+                        "surface-container": "#1a221a",
+                        "surface-bright": "#333b33",
+                        "inverse-surface": "#dce5d9",
+                        "surface-variant": "#2f372e",
+                        "secondary": "#7bd0ff",
+                        "secondary-fixed": "#c4e7ff"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-caps": ["JetBrains Mono"],
+                        "display-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-lg min-h-screen pb-32">
+<!-- Header Navigation -->
+<header class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl h-16">
+<div class="flex items-center justify-between px-container-padding-mobile md:px-container-padding-desktop h-full max-w-7xl mx-auto">
+<h1 class="font-display-lg text-display-lg-mobile tracking-tighter text-primary">MoodAI</h1>
+<div class="hidden md:flex gap-8 items-center">
+<a class="text-primary font-bold transition-colors" href="#">Library</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Explore</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Radio</a>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A high-quality close-up studio portrait of a sophisticated person with calm lighting, reflecting a premium modernist tech aesthetic with soft green backlighting. The skin texture is realistic, and the background is a deep, blurred navy studio setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaI1WO7z0rnGKjL_06SColRHkn4JEsMkefT-dh3UVb--fk-4XlzcAhFQcesfqLd_N7m4PpIGawtmmoc2k3wIo-xHXNZVIuwi3_7Hnvp8-97LRekYz-_7AIYKJA6eM8-TcuNTrx8A5iOOr3KlNBqf7l4dw9kMenpQFBrbNvwlPMnN7Au2dx9Ln5qgigvyRI48T3PM4fWDf3fggLqXaDFGoxahxLRxaoY-gsz5GHoijD0zxizk_X1VtWKOsrg-WpKgUhmBDiGByZPRg"/>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-container-padding-mobile md:px-container-padding-desktop pt-24 space-y-16">
+<!-- Search & Mood Filters -->
+<section class="space-y-8">
+<div class="relative max-w-2xl">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-xl py-4 pl-12 pr-4 text-on-surface focus:outline-none focus:border-primary transition-all font-label-caps placeholder:text-on-surface-variant" placeholder="WHAT'S YOUR FREQUENCY?" type="text"/>
+</div>
+<div class="flex flex-wrap gap-3">
+<button class="px-5 py-2 rounded-full border border-primary text-primary bg-primary/10 font-label-caps emerald-glow transition-all">FOCUSED</button>
+<button class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant bg-surface-container-low hover:border-primary hover:text-primary font-label-caps transition-all">ENERGISED</button>
+<button class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant bg-surface-container-low hover:border-primary hover:text-primary font-label-caps transition-all">RELAXED</button>
+<button class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant bg-surface-container-low hover:border-primary hover:text-primary font-label-caps transition-all">MELANCHOLIC</button>
+<button class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant bg-surface-container-low hover:border-primary hover:text-primary font-label-caps transition-all">EUPHORIC</button>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Left Column: Library & Interactive Elements -->
+<div class="lg:col-span-8 space-y-12">
+<!-- Track Rows Section -->
+<div class="space-y-6">
+<h2 class="font-headline-md text-headline-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+                        AI Recommendations
+                    </h2>
+<div class="space-y-2">
+<!-- Active/Playing Track -->
+<div class="flex items-center gap-4 p-3 rounded-lg bg-surface-container-highest border border-primary/20 group transition-all">
+<div class="relative w-14 h-14 rounded-md overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Abstract electronic music album art featuring flowing neon green fluid dynamics on a deep charcoal background, hyper-detailed with 8k resolution, minimalist yet energetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5T37JGlyC49l9Y1KrOFU_Q3oiW_ELmZ9EafI7nVUmygpjmlHN7y9oCztTFvhbFkKNR_AZ1x7VZwKrMiZs7jhWKRLBTzoOURsXMNASxjAtqBSATwulmtntOm1GQZnchndGjAYIfse7dvVIEQ_hZoThwGC5dg-nJEIKQDvoRDSFTd8i847iRLluZqFPw_OfVQU1_7_Lz5yvBU-9v0ce5lg5yCDOHKlRgCthdmSB1Uiq3I5nfH24ZcCaNivh9da1hvGRrBJTQTe5x-8"/>
+<div class="absolute inset-0 bg-background/60 flex items-center justify-center opacity-100">
+<div class="flex gap-1 items-end h-4">
+<div class="eq-bar"></div>
+<div class="eq-bar"></div>
+<div class="eq-bar"></div>
+</div>
+</div>
+</div>
+<div class="flex-grow">
+<h3 class="font-bold text-primary">Digital Resonance</h3>
+<p class="text-body-sm text-on-surface-variant">Synthetic Dreams</p>
+<p class="text-[10px] font-label-caps text-primary mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                                    MATCHES YOUR FOCUS STATE
+                                </p>
+</div>
+<div class="flex items-center gap-4 px-4">
+<span class="text-caption text-on-surface-variant">3:42</span>
+<button class="text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Idle Track -->
+<div class="flex items-center gap-4 p-3 rounded-lg hover:bg-surface-container-low group transition-all">
+<div class="relative w-14 h-14 rounded-md overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover group-hover:opacity-60 transition-opacity" data-alt="Surrealist album art showing a crystalline structure reflecting prismatic light against a dark navy sky, clean architectural lines, sophisticated and calm mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGcOrtlP9hOsE9ekN6M1TAKupeKwmX_WAXr2Lh4cUVEGHkjs0YfMy4TfzJFEAOeGp-q3SzJg6m3fDuDA6Y6PFoZ0TzL4RXIGF6TYoazJ-vLmWlzgueOyjpV5wvsLmgqvbKyyswPo7rm4c-OVKgYnYxHGNJraufFZCzPEywClBYCxKrdOy2JQQFqhLsaXQhDsxC465vuJWtMlgrD0wa7gLie2Afcn3EBM6fRT8akHEpqUxJW1NagQ2kgVmXNoZAWAPfhtGsZwEbwbM"/>
+<button class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+</button>
+</div>
+<div class="flex-grow">
+<h3 class="font-bold">Prism Horizon</h3>
+<p class="text-body-sm text-on-surface-variant">The Glitch</p>
+<p class="text-[10px] font-label-caps text-on-surface-variant mt-1">SIMILAR TO RECENT LISTENING</p>
+</div>
+<div class="flex items-center gap-4 px-4">
+<span class="text-caption text-on-surface-variant">4:15</span>
+<button class="text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+</div>
+<!-- Skeleton Loader -->
+<div class="flex items-center gap-4 p-3 animate-pulse">
+<div class="w-14 h-14 bg-surface-container-highest rounded-md"></div>
+<div class="flex-grow space-y-2">
+<div class="h-4 bg-surface-container-highest rounded w-1/3"></div>
+<div class="h-3 bg-surface-container-highest rounded w-1/4"></div>
+</div>
+<div class="w-12 h-3 bg-surface-container-highest rounded"></div>
+</div>
+</div>
+</div>
+<!-- Button Gallery -->
+<div class="space-y-6">
+<h2 class="font-headline-md text-headline-md">UI Kit: Controls</h2>
+<div class="flex flex-wrap gap-6 items-center">
+<button class="bg-primary text-on-primary h-12 px-8 rounded-full font-bold active:scale-95 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                            START SESSION
+                        </button>
+<button class="border border-outline text-on-surface h-12 px-8 rounded-full font-bold hover:bg-surface-container-highest transition-all">
+                            SAVE TO LIBRARY
+                        </button>
+<button class="text-on-surface-variant hover:text-primary font-bold transition-colors">
+                            DISMISS
+                        </button>
+</div>
+<div class="flex gap-8 items-center">
+<div class="flex flex-col items-center gap-2">
+<button class="w-16 h-16 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<span class="text-label-caps text-on-surface-variant">IDLE</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="w-16 h-16 rounded-full bg-surface-container-highest text-primary border-2 border-primary flex items-center justify-center active:scale-90 transition-all">
+<div class="flex gap-1 items-end h-5">
+<div class="eq-bar w-1"></div>
+<div class="eq-bar w-1"></div>
+<div class="eq-bar w-1"></div>
+<div class="eq-bar w-1"></div>
+</div>
+</button>
+<span class="text-label-caps text-on-surface-variant">PLAYING</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Artist Cards & Visuals -->
+<div class="lg:col-span-4 space-y-12">
+<section class="space-y-6">
+<h2 class="font-headline-md text-headline-md">Featured Artists</h2>
+<div class="grid grid-cols-1 gap-6">
+<!-- Artist Card -->
+<div class="glass-panel p-4 rounded-2xl group cursor-pointer hover:border-primary/50 transition-all luminous-shadow">
+<div class="aspect-square rounded-xl overflow-hidden mb-4 relative">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Stylized artistic portrait of a modern electronic music producer in a dark studio, wearing sleek headphones, surrounded by glowing modular synth equipment. The lighting is cinematic with high contrast emerald and deep navy tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCECzZpT5xhAJ20JlY3GDQbVsAxzwAYHPiyjR-Nohm75J5TYvXAWOk18HAoaZ0Rkcdu2z-H_s4HsEjfbtxwC5grn4uNoKfRzCKhXMA8GRqf7OAGAONNdSwCTPoyT-vluOdT1aRaAGdQlfB8ED2154SQ1utArLQnEB3d4KTJjbNqB7RZ3JtU1jZmDvevf_qnW4dFuGWnyoG_ddsiBDZJgS5qMO4hjElvsmeKaWL0GG4HhSR0UCYrynPhc6qXnGfkUyBbTBOICOPmOOo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+<button class="bg-primary text-on-primary p-3 rounded-full shadow-xl">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shuffle</span>
+</button>
+</div>
+</div>
+<h3 class="font-bold text-lg mb-1">Ether Drift</h3>
+<p class="text-on-surface-variant text-body-sm mb-3">Experimental Electronic</p>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-label-caps text-primary">LIVE NOW</span>
+</div>
+</div>
+<!-- Artist Card Skeleton -->
+<div class="glass-panel p-4 rounded-2xl animate-pulse">
+<div class="aspect-square bg-surface-container-highest rounded-xl mb-4"></div>
+<div class="h-4 bg-surface-container-highest rounded w-1/2 mb-2"></div>
+<div class="h-3 bg-surface-container-highest rounded w-1/3"></div>
+</div>
+</div>
+</section>
+<!-- Visualization Box -->
+<div class="relative glass-panel aspect-video rounded-2xl overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
+<div class="absolute inset-0 flex items-center justify-center flex-col gap-2">
+<span class="material-symbols-outlined text-primary text-5xl opacity-40 group-hover:scale-110 transition-transform">graphic_eq</span>
+<p class="text-label-caps text-on-surface-variant opacity-60">PULSE ANALYZER</p>
+</div>
+<!-- Micro-interaction overlay -->
+<div class="absolute bottom-0 left-0 w-full h-1 bg-surface-container-highest">
+<div class="h-full bg-primary w-1/3 transition-all duration-1000 group-hover:w-full"></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Navigation Shell (Desktop) -->
+<nav class="hidden md:block fixed left-0 top-0 h-full w-20 border-r border-outline-variant bg-background/50 backdrop-blur-md z-40">
+<div class="flex flex-col items-center py-24 gap-12 h-full">
+<button class="text-primary active:scale-95 transition-all">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">home</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined text-3xl">explore</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined text-3xl">library_music</span>
+</button>
+<div class="mt-auto">
+<button class="text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined text-3xl">settings</span>
+</button>
+</div>
+</div>
+</nav>
+<!-- Bottom Player (Persistent Shell) -->
+<div class="fixed bottom-0 left-0 w-full glass-panel h-20 px-container-padding-mobile md:px-container-padding-desktop z-50 flex items-center justify-between">
+<div class="flex items-center gap-4 max-w-[200px] md:max-w-xs">
+<img class="w-12 h-12 rounded bg-surface-container-highest" data-alt="Album art showing abstract digital rain in emerald green against a black void, very minimalist and high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNy7TDiqhkqz077Y-pk4Y9nKu4i5Hbn5G0FPYke_uAlnj57KfTqpwZnwTKBFJk6VzVnHOLeElZWjhBVRRzZ8Af5VNYuQCkbZitX3dB5m8_8hbsC1BWhZ2ILr6uo4xzP3ncYB5mF5uxpiWt3s01HYjqis0mFlDHAdyMYjeAlBeXcx1NYBvM9XcCZxKa9699yZiwFbTS-bjAzRKhXurKr1QZUJUll-UdcAZEKnwdmHKTNvS9KeHHa4ZTpxTLJLEOjkb77uRjKVqMMus"/>
+<div class="truncate">
+<h4 class="font-bold text-sm truncate">Digital Resonance</h4>
+<p class="text-caption text-on-surface-variant truncate">Synthetic Dreams</p>
+</div>
+</div>
+<div class="flex flex-col items-center gap-1 flex-grow max-w-xl px-8">
+<div class="flex items-center gap-6">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">shuffle</span></button>
+<button class="text-on-surface hover:text-primary"><span class="material-symbols-outlined">skip_previous</span></button>
+<button class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">pause</span>
+</button>
+<button class="text-on-surface hover:text-primary"><span class="material-symbols-outlined">skip_next</span></button>
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">repeat</span></button>
+</div>
+<div class="w-full flex items-center gap-3">
+<span class="text-[10px] font-label-caps text-on-surface-variant w-8">2:14</span>
+<div class="flex-grow h-1 bg-surface-container-highest rounded-full overflow-hidden group cursor-pointer relative">
+<div class="h-full bg-primary w-[60%] relative">
+<div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+</div>
+<span class="text-[10px] font-label-caps text-on-surface-variant w-8">3:42</span>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-4 w-48 justify-end">
+<span class="material-symbols-outlined text-on-surface-variant">volume_up</span>
+<div class="w-24 h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[80%]"></div>
+</div>
+<button class="text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined">fullscreen</span>
+</button>
+</div>
+</div>
+</body></html>

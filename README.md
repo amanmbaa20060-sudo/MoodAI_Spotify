@@ -20,6 +20,14 @@ Deploy with the root [`render.yaml`](render.yaml) blueprint and follow **[docs/p
 
 The API serves from **Postgres**, not the CSV file, at runtime.
 
+## Quick start (local UI)
+
+```bash
+python scripts/run_dev.py
+```
+
+Opens **http://127.0.0.1:8010/** (not port 8000 — often used by other apps).
+
 ## Phase 0 status
 
 Phase 0 (data pipeline) is implemented. See **[docs/phase0-setup.md](docs/phase0-setup.md)** for the full runbook.
