@@ -1,5 +1,6 @@
 # MoodAI Vercel deploy is static frontend only (API runs on Render).
-# Exclude Python/backend files so Vercel does not enable the Python runtime.
+# Use Root Directory: phases/phase-3/static  (recommended)
+# Or leave Root Directory empty and deploy from repo root via root vercel.json.
 
 requirements.txt
 requirements-prod.txt
@@ -7,6 +8,8 @@ pyproject.toml
 Pipfile
 Pipfile.lock
 uv.lock
+
+apps/
 
 phases/phase-1/
 phases/phase-2/
@@ -22,6 +25,7 @@ scripts/render_start.sh
 scripts/apply_schemas.py
 scripts/seed_all.py
 scripts/run_dev.py
+scripts/vercel_build.mjs
 
 data/
 docs/

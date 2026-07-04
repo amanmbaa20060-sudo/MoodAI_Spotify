@@ -24,3 +24,5 @@ Thumbs.db
 
 # Vercel static build output
 dist/
+phases/phase-3/static/dist/
+apps/web/dist/
