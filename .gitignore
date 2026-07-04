@@ -21,3 +21,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Vercel static build output
+dist/

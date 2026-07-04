@@ -4,6 +4,7 @@
  */
 
 const USER_ID = new URLSearchParams(window.location.search).get("user") || "demo-user";
+const API_BASE = (window.__MOODAI_CONFIG__ && window.__MOODAI_CONFIG__.apiBaseUrl) || "";
 const API_HEADERS = { "X-User-Id": USER_ID, "Content-Type": "application/json" };
 
 const MOODS = [
@@ -78,7 +79,7 @@ function formatDateLabel() {
 }
 
 async function api(path, options = {}) {
-  const response = await fetch(path, {
+  const response = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: { ...API_HEADERS, ...(options.headers || {}) },
   });
@@ -855,7 +856,7 @@ async function init() {
   setView("home");
 
   try {
-    const health = await fetch("/healthz").then((response) => response.json());
+    const health = await fetch(`${API_BASE}/healthz`).then((response) => response.json());
     if (health.product !== "MoodAI Spotify" || health.phase !== "3") {
       showWrongAppScreen();
       return;

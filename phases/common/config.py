@@ -51,6 +51,7 @@ class Settings:
     adaptive_drop_size: int = int(os.getenv("ADAPTIVE_DROP_SIZE", "10"))
     drop_partitions: int = int(os.getenv("DROP_PARTITIONS", "4"))
     llm_token_budget_per_day: int = int(os.getenv("LLM_TOKEN_BUDGET_PER_DAY", "5000"))
+    cors_origins: str = os.getenv("CORS_ORIGINS", "")
 
 
 @lru_cache(maxsize=1)

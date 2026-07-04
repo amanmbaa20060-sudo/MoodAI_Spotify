@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import os
 import sys
 from datetime import date
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -132,6 +134,29 @@ def create_app(services: tuple | None = None) -> FastAPI:
 
     app = FastAPI(title="MoodAI Phase 3 — Optimization & Scale", version="3.0.0")
     static_dir = Path(__file__).resolve().parent.parent / "static"
+
+    cors_origins = [
+        origin.strip()
+        for origin in settings.cors_origins.split(",")
+        if origin.strip()
+    ]
+    if cors_origins:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=cors_origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*", "X-User-Id"],
+        )
+    elif os.getenv("CORS_ALLOW_VERCEL", "").lower() in {"1", "true", "yes", "on"}:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origin_regex=r"https://.*\.vercel\.app",
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*", "X-User-Id"],
+        )
+
     for name, value in (
         ("settings", settings),
         ("repository", repository),
