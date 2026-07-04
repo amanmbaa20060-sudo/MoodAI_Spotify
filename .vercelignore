@@ -1,0 +1,31 @@
+# MoodAI Vercel deploy is static frontend only (API runs on Render).
+# Exclude Python/backend files so Vercel does not enable the Python runtime.
+
+requirements.txt
+requirements-prod.txt
+pyproject.toml
+Pipfile
+Pipfile.lock
+uv.lock
+
+phases/phase-1/
+phases/phase-2/
+phases/phase-3/app/
+phases/phase-3/tests/
+phases/phase-3/requirements.txt
+phases/phase-2/requirements.txt
+phases/phase-1/requirements.txt
+phases/common/
+
+scripts/*.py
+scripts/render_start.sh
+scripts/apply_schemas.py
+scripts/seed_all.py
+scripts/run_dev.py
+
+data/
+docs/
+render.yaml
+runtime.txt
+.env
+*.py
