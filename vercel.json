@@ -3,7 +3,7 @@
   "version": 2,
   "framework": null,
   "installCommand": "",
-  "buildCommand": "node build.mjs",
+  "buildCommand": "node scripts/vercel_build.mjs",
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/assets/(.*)", "destination": "/assets/$1" },

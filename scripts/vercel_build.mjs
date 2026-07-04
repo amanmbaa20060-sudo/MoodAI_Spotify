@@ -6,10 +6,9 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-const appRoot = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(appRoot, "..");
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const src = path.join(repoRoot, "phases", "phase-3", "static");
-const out = path.join(appRoot, "dist");
+const out = path.join(repoRoot, "dist");
 const apiUrl = (process.env.MOODAI_API_URL || "").replace(/\/$/, "");
 
 const indexPath = path.join(src, "index.html");
