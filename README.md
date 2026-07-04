@@ -33,7 +33,7 @@ Opens **http://127.0.0.1:8010/** (not port 8000 — often used by other apps).
 Phase 0 (data pipeline) is implemented. See **[docs/phase0-setup.md](docs/phase0-setup.md)** for the full runbook.
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements-api.txt
 copy .env.example .env
 docker compose up -d
 python scripts/seed_all.py --generate
@@ -59,7 +59,7 @@ git clone https://github.com/amanmbaa20060-sudo/MoodAI_Spotify.git
 cd MoodAI_Spotify
 python -m venv .venv
 .venv\Scripts\activate        # Windows
-pip install -r requirements.txt
+pip install -r requirements-api.txt
 copy .env.example .env
 ```
 

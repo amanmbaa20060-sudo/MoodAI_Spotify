@@ -1,8 +1,0 @@
-{
-  "name": "moodai-web",
-  "private": true,
-  "description": "MoodAI Spotify mobile web UI (static) — API runs on Render",
-  "scripts": {
-    "build": "node scripts/vercel_build.mjs"
-  }
-}
