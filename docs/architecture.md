@@ -2,8 +2,8 @@
 
 **Document purpose:** Detailed technical architecture for implementation and review.  
 **Source:** [`docs/problemstatement.md`](./problemstatement.md)  
-**Version:** 1.1  
-**Status:** Draft (LLM-enabled)
+**Version:** 1.2  
+**Status:** Draft (LLM-enabled; Render + Vercel deployment)
 
 ---
 
@@ -851,13 +851,13 @@ python scripts/validate_coverage.py
 
 #### Dev vs production
 
-| Environment | Source | Mood logic |
-|-------------|--------|------------|
-| **Dev / local** | CSV seed (`seed/v1/tracks.csv`) | §6.5 thresholds |
-| **Staging** | Subset of prod catalog ETL | Same §6.5 thresholds |
-| **Production** | Nightly catalog ETL | Same §6.5 thresholds, full catalog |
+| Environment | Source | Mood logic | Hosting |
+|-------------|--------|------------|---------|
+| **Dev / local** | CSV seed or demo catalog | §6.5 thresholds | `scripts/run_dev.py` → `:8010` |
+| **Staging** | Subset of prod catalog ETL | Same §6.5 thresholds | Optional Render preview |
+| **Production** | `Music_Data.csv` seeded into Postgres (once) | Same §6.5 thresholds | Render Postgres; API on Render |
 
-The **same bucketing rules and `dataset_version`** must be used in all environments so mood-tagged catalog behavior is identical; only catalog size differs.
+The **same bucketing rules and `dataset_version`** must be used in all environments so mood-tagged catalog behavior is identical; only catalog size differs. The API **never reads CSV at request time** in production.
 
 ---
 
@@ -1222,6 +1222,8 @@ Scheduler (Kubernetes CronJob)
 
 ### 12.1 Recommended Stack (Reference)
 
+**Spotify-scale reference (design target):**
+
 | Layer | Technology | Notes |
 |-------|------------|-------|
 | **Compute** | Kubernetes (EKS/GKE) | Existing Spotify k8s likely |
@@ -1235,7 +1237,24 @@ Scheduler (Kubernetes CronJob)
 | **Secrets** | Vault / cloud SM | API keys, LLM provider credentials |
 | **LLM Provider** | Groq | Grounded text generation |
 
+**Grad project deployment (this repository):**
+
+| Layer | Platform | Artifact / path |
+|-------|----------|-----------------|
+| **Backend API (Phase 3 BFF)** | [Render](https://render.com) Web Service | `phases/phase-3` FastAPI app |
+| **Frontend (mobile web UI)** | [Vercel](https://vercel.com) *(planned)* | `phases/phase-3/static/` (Stitch UI) |
+| **PostgreSQL** | Render Managed Postgres | Catalog, drops, mood prefs |
+| **Redis** | Render Key Value | Home edge cache, prewarm |
+| **Batch / cron** | Render Cron Jobs | Drop generator, LLM prewarm, candidate prewarm |
+| **Catalog seed (one-time)** | Developer laptop | `scripts/seed_all.py` → external `DATABASE_URL` |
+| **LLM** | Groq API | `GROQ_API_KEY` on Render services |
+| **IaC** | `render.yaml` Blueprint | Optional one-click stack |
+
+See [`docs/production-runbook.md`](./production-runbook.md) for step-by-step Render setup and [`docs/phasewiseimplementation.md`](./phasewiseimplementation.md) §7.4 for phase-by-phase rollout.
+
 ### 12.2 Deployment Topology
+
+**Reference (Spotify-scale):**
 
 ```
 Region: us-east-1 (example)
@@ -1250,11 +1269,126 @@ Region: us-east-1 (example)
 └── postgres (RDS multi-AZ) + redis cluster
 ```
 
-### 12.3 Network
+**Grad project (Render + Vercel):**
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         PRODUCTION (grad project)                        │
+├─────────────────────────────────────────────────────────────────────────┤
+│  Vercel (planned)              Render                                     │
+│  ┌──────────────────┐          ┌──────────────────────────────────────┐  │
+│  │ Mobile web UI    │  HTTPS   │ moodai-api (Web Service)             │  │
+│  │ index.html       │ ───────▶ │ Phase 3 FastAPI BFF + /v1/* APIs     │  │
+│  │ app.js (Stitch)  │  CORS    │ GET / serves UI until Vercel cutover │  │
+│  └──────────────────┘          └───────────────┬──────────────────────┘  │
+│         ▲                                     │                           │
+│         │ VITE_/NEXT_PUBLIC_API_URL           │ internal                  │
+│         │ = https://moodai-api.onrender.com   ▼                           │
+│                                 ┌──────────────┐  ┌──────────────┐       │
+│                                 │ moodai-db    │  │ moodai-redis │       │
+│                                 │ (Postgres)   │  │ (Key Value)  │       │
+│                                 └──────────────┘  └──────────────┘       │
+│                                 ┌──────────────────────────────────┐     │
+│                                 │ Cron: daily-drop, llm-prewarm,    │     │
+│                                 │       candidate-prewarm            │     │
+│                                 └──────────────────────────────────┘     │
+└─────────────────────────────────────────────────────────────────────────┘
+
+Developer laptop (one-time / on change):
+  Music_Data.csv ──seed──▶ Render Postgres (external DATABASE_URL)
+  scripts/apply_schemas.py
+  scripts/seed_all.py
+```
+
+**Current state (interim):** The Stitch mobile UI is **co-hosted** on Render (`GET /` + `/assets/*` from the same web service). **Target state:** UI on Vercel, API-only on Render; frontend calls Render via public API base URL.
+
+### 12.3 Render backend — service catalog
+
+Defined in root [`render.yaml`](../render.yaml). Manual setup uses the same commands.
+
+| Render resource | Name | Role |
+|-----------------|------|------|
+| PostgreSQL | `moodai-db` | Runtime catalog (`tracks`, `track_mood_tags`, `play_history`, drops) |
+| Key Value | `moodai-redis` | Edge cache + prewarm |
+| Web Service | `moodai-api` | Phase 3 BFF, health check `/healthz` |
+| Cron Job | `moodai-daily-drop` | `0 6 * * *` UTC — discovery drops |
+| Cron Job | `moodai-llm-prewarm` | Every 6h — LLM reason cache |
+| Cron Job | `moodai-candidate-prewarm` | Every 6h (+30m) — candidate pools |
+
+**Web service commands (repo root):**
+
+| Setting | Value |
+|---------|--------|
+| **Build** | `pip install --upgrade pip && pip install -r requirements-prod.txt` |
+| **Start** | `bash scripts/render_start.sh` |
+| **Health check** | `/healthz` |
+| **Python** | `runtime.txt` → 3.11.9 |
+
+**Required environment variables (`moodai-api`):**
+
+| Variable | Source |
+|----------|--------|
+| `DATABASE_URL` | Linked Postgres (internal URL) |
+| `REDIS_URL` | Linked Key Value |
+| `GROQ_API_KEY` | Manual secret |
+| `LLM_PROVIDER`, `GROQ_MODEL`, `GROQ_BASE_URL` | Blueprint defaults |
+| `SMART_MOOD_DEFAULT_ENABLED`, `HOME_CACHE_TTL_SECONDS`, etc. | See `render.yaml` |
+
+**Do not set** `MOODAI_DEMO_MODE=true` in production — that forces in-memory demo data instead of Postgres.
+
+**Data bootstrap (from laptop, before demo):**
+
+1. `python scripts/apply_schemas.py` with Render **external** `DATABASE_URL`
+2. `python scripts/seed_all.py --source data/source/Music_Data.csv`
+3. Verify: `curl https://<service>/healthz` and `GET /v1/home` with `X-User-Id: demo-user`
+
+### 12.4 Vercel frontend — planned deployment
+
+The mobile web client is implemented as static assets in `phases/phase-3/static/` (Google Stitch export + API wiring in `app.js`).
+
+| Aspect | Plan |
+|--------|------|
+| **Host** | Vercel static site or Vite/Next wrapper (TBD) |
+| **Root directory** | `phases/phase-3/static/` or dedicated `apps/web/` when extracted |
+| **API base URL** | Env var e.g. `VITE_MOODAI_API_URL` / `NEXT_PUBLIC_MOODAI_API_URL` → Render web service URL |
+| **Auth header** | `X-User-Id: demo-user` (grad demo); replace with real auth later |
+| **CORS** | Enable FastAPI `CORSMiddleware` on Render for Vercel origin(s) before cutover |
+| **Cutover** | Remove or redirect `GET /` on Render to API-only; UI served exclusively from Vercel |
+
+**Vercel environment (example):**
+
+```
+VITE_MOODAI_API_URL=https://moodai-api.onrender.com
+```
+
+**Frontend build considerations:**
+
+- Tailwind loaded via CDN in current static HTML — acceptable for MVP; optional build step later
+- All data fetched client-side from `/v1/home`, `/v1/users/me/mood`, `/v1/search/artists`, etc.
+- No server-side rendering required for grad demo
+
+### 12.5 Environment matrix
+
+| Environment | Frontend | Backend | Database | Catalog source |
+|-------------|----------|---------|----------|----------------|
+| **Local dev** | `http://127.0.0.1:8010/` (`scripts/run_dev.py`) | Same process (Phase 3) | Docker Postgres or demo mode | `Music_Data.csv` or sample |
+| **Production (interim)** | Render `GET /` (co-hosted) | Render `moodai-api` | Render Postgres | Seeded once from laptop |
+| **Production (target)** | Vercel | Render `moodai-api` | Render Postgres | Seeded once from laptop |
+
+### 12.6 Network
+
+**Reference (Spotify-scale):**
 
 - All internal traffic: mTLS via service mesh
 - BFF public: API gateway with WAF
 - No direct client access to internal ranker/novelty services
+
+**Grad project:**
+
+- Render services in same region use **internal** `DATABASE_URL` / `REDIS_URL`
+- Laptop seeding uses Postgres **external** URL only
+- Vercel → Render: HTTPS over public internet; restrict CORS to Vercel preview + production domains
+- Groq: outbound HTTPS from Render web + cron services
 
 ---
 
@@ -1423,6 +1557,12 @@ Region: us-east-1 (example)
 **Rationale:** Product promise of "never heard"; trust damage is asymmetric.  
 **Consequence:** Smaller candidate pool for heavy listeners; genre expansion fallback.
 
+### ADR-008: Grad project hosting — Render backend, Vercel frontend
+
+**Decision:** Deploy Phase 3 API + data on **Render**; deploy mobile web UI on **Vercel** (planned). Co-host UI on Render until Vercel cutover.  
+**Rationale:** Free/low-cost managed Postgres, Redis, and cron on Render; Vercel optimized for static/edge frontend; clear separation of API and client.  
+**Consequence:** CORS required when UI moves to Vercel; `VITE_MOODAI_API_URL` (or equivalent) in frontend env; one-time catalog seed from laptop via external `DATABASE_URL`.
+
 ### ADR-006: BFF aggregation pattern
 
 **Decision:** Single `/home` aggregated endpoint.  
@@ -1487,6 +1627,8 @@ Region: us-east-1 (example)
 | LLM in discovery pipeline | §5.10, §9.1, §9.4, ADR-007 |
 | Dataset mood bucketing (numeric only) | §6.5 |
 | Visual artist search | §5.9, §8.4 |
+| Render backend deployment | §12.3, §12.5 |
+| Vercel frontend deployment | §12.4 |
 | &lt;2s mood refresh | §2.2, §10.3, §8.2 |
 | Reuse existing rec engine | §1.1, §9.3, ADR-001 |
 

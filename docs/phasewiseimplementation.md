@@ -3,8 +3,8 @@
 **Document purpose:** Actionable, phase-by-phase build plan for implementation and deployment.  
 **Sources:** [`docs/problemstatement.md`](./problemstatement.md) · [`docs/architecture.md`](./architecture.md)  
 **Repository:** [github.com/amanmbaa20060-sudo/MoodAI_Spotify](https://github.com/amanmbaa20060-sudo/MoodAI_Spotify)  
-**Version:** 1.0  
-**Status:** Active
+**Version:** 1.1  
+**Status:** Active (Render backend + Vercel frontend planned)
 
 ---
 
@@ -210,7 +210,7 @@ Docker local     BFF + Home API       LLM on all modules      Edge caching
 | 1.15 | Implement Home Feed Composer | Pin `mood_gateway` + `discovery_drop`; add `fresh_picks` |
 | 1.16 | Mood tap → re-rank | Invalidate `home:{user}:{mood}`; re-score cached candidates <1.5s p95 |
 | 1.17 | Add basic analytics events | `MoodChanged`, `DiscoveryDropReady`, `RecommendationServed` |
-| 1.18 | Deploy BFF + worker to Render | Internal `DATABASE_URL`; optional Redis |
+| 1.18 | Deploy BFF to Render | Web service + Postgres; see §7.4.2; seed real data §7.4.4 |
 | 1.19 | End-to-end demo script | App open → mood tap → play drop → verify novel tracks |
 
 ### 1.4 API contracts (MVP)
@@ -346,6 +346,16 @@ Docker local     BFF + Home API       LLM on all modules      Edge caching
 | 3.8 | Connection pooling for Postgres | Respect Render connection limits |
 | 3.9 | LLM token budget per user/day | architecture §5.10 |
 
+#### Production deployment
+
+| # | Task | Details |
+|---|------|---------|
+| 3.13 | Deploy Phase 3 stack on Render | Blueprint `render.yaml` or manual §7.4.2 |
+| 3.14 | Seed production Postgres | `apply_schemas.py` + `seed_all.py` with external URL |
+| 3.15 | Verify Render crons | Manual trigger daily-drop, llm-prewarm, candidate-prewarm |
+| 3.16 | Deploy frontend to Vercel *(planned)* | Static UI from `phases/phase-3/static/`; API URL env var §7.4.5 |
+| 3.17 | Enable CORS on Render API | Required before Vercel cutover |
+
 #### Experimentation & tuning
 
 | # | Task | Details |
@@ -361,6 +371,8 @@ Docker local     BFF + Home API       LLM on all modules      Edge caching
 - [ ] 95% of users have READY drop within 5 min of refresh window
 - [ ] LLM cost per user per day within budget
 - [ ] Production runbook + on-call dashboards complete
+- [ ] Render backend live with real catalog data (§7.4.4)
+- [ ] (Planned) Vercel frontend deployed with cross-origin API calls
 
 ---
 
@@ -395,36 +407,134 @@ Docker local     BFF + Home API       LLM on all modules      Edge caching
 | E2E | SQL mood queries | home + mood + drop | search grid + push | load test |
 | Data | coverage ≥200/mood | 0 played in drop | image URLs present | full catalog scale |
 
-### 7.4 Render deployment by phase
+### 7.4 Production deployment — Render (backend) + Vercel (frontend)
+
+**Strategy:** Backend and data on **Render**; mobile web UI on **Vercel** (planned). Until Vercel cutover, the Stitch UI is co-hosted on Render at `GET /`.
+
+| Layer | Platform | Status | Reference |
+|-------|----------|--------|-----------|
+| **API (Phase 3 BFF)** | Render Web Service | Implemented | `phases/phase-3/`, `render.yaml` |
+| **PostgreSQL** | Render Postgres | Implemented | `moodai-db` |
+| **Redis** | Render Key Value | Implemented | `moodai-redis` |
+| **Cron jobs** | Render Cron | Implemented | Drop, LLM prewarm, candidate prewarm |
+| **Mobile web UI** | Vercel | Planned | `phases/phase-3/static/` |
+| **Catalog seed** | Developer laptop | One-time | `scripts/seed_all.py` |
+
+Full runbook: [`docs/production-runbook.md`](./production-runbook.md).
+
+#### 7.4.1 Render backend by phase
 
 | Phase | Render services |
 |-------|-----------------|
-| **0** | Postgres (managed) |
+| **0** | Postgres (managed); seed via external `DATABASE_URL` |
 | **1** | Web Service (BFF) + Postgres; optional Cron (drop generator) |
-| **2** | + Background worker (LLM prewarm); push via third-party or Render cron |
-| **3** | + Redis (Key Value); autoscale workers; read replica if needed |
+| **2** | + Cron (LLM prewarm); push via third-party or Render cron |
+| **3** | + Redis (Key Value); candidate prewarm cron; edge cache on BFF |
 
-### 7.5 Repository structure (target)
+#### 7.4.2 Render web service (`moodai-api`) — manual setup
+
+| Setting | Value |
+|---------|--------|
+| **Root Directory** | *(empty — repo root)* |
+| **Runtime** | Python 3 (`runtime.txt` → 3.11.9) |
+| **Build Command** | `pip install --upgrade pip && pip install -r requirements-prod.txt` |
+| **Start Command** | `bash scripts/render_start.sh` |
+| **Health Check Path** | `/healthz` |
+
+**Environment variables (minimum):**
+
+| Variable | Required | Notes |
+|----------|----------|-------|
+| `DATABASE_URL` | Yes | Internal URL from linked Postgres |
+| `REDIS_URL` | Yes | From linked Key Value (Phase 3) |
+| `GROQ_API_KEY` | Yes | Secret; also on drop + LLM prewarm crons |
+| `LLM_PROVIDER` | No | `groq` |
+| `GROQ_MODEL` | No | `llama-3.1-8b-instant` |
+| `SMART_MOOD_DEFAULT_ENABLED` | No | `true` in production |
+| `MOODAI_DEMO_MODE` | No | **Do not set** in production |
+
+#### 7.4.3 Render cron jobs
+
+| Cron | Schedule (UTC) | Start command |
+|------|----------------|---------------|
+| `moodai-daily-drop` | `0 6 * * *` | `python phases/phase-1/scripts/generate_drop.py` |
+| `moodai-llm-prewarm` | `0 */6 * * *` | `python phases/phase-2/scripts/llm_prewarm.py` |
+| `moodai-candidate-prewarm` | `30 */6 * * *` | `python phases/phase-3/scripts/candidate_prewarm.py` |
+
+Build command for all crons: `pip install --upgrade pip && pip install -r requirements-prod.txt`
+
+#### 7.4.4 Real data bootstrap (required for production demo)
+
+From developer laptop (not on Render):
+
+```powershell
+pip install -r requirements-prod.txt
+$env:DATABASE_URL = "<Render Postgres EXTERNAL URL>"
+python scripts/apply_schemas.py
+python scripts/seed_all.py --source data/source/Music_Data.csv
+```
+
+Expected: ~114k tracks, ~31k mood-tagged (see `data/dataset_manifest.json`).
+
+Verify after deploy:
+
+```bash
+curl https://YOUR-SERVICE.onrender.com/healthz
+curl -H "X-User-Id: demo-user" https://YOUR-SERVICE.onrender.com/v1/home
+```
+
+#### 7.4.5 Vercel frontend (planned)
+
+| Step | Action |
+|------|--------|
+| 1 | Deploy `phases/phase-3/static/` as Vercel static site (or extract to `apps/web/`) |
+| 2 | Set `VITE_MOODAI_API_URL=https://moodai-api.onrender.com` (or equivalent) |
+| 3 | Update `app.js` to use env-based API base URL instead of same-origin `/v1/*` |
+| 4 | Add CORS on Render FastAPI for Vercel production + preview domains |
+| 5 | Cut over: UI on Vercel; Render serves API only (`/v1/*`, `/healthz`) |
+
+**Interim:** UI available at Render root URL (`GET /`) — same origin, no CORS needed.
+
+#### 7.4.6 Deployment checklist
+
+```
+[ ] Render Postgres + Redis created (same region)
+[ ] Web service build/start commands set; health check /healthz
+[ ] GROQ_API_KEY on API + drop + LLM prewarm crons
+[ ] Schemas applied (apply_schemas.py)
+[ ] Music_Data.csv seeded (seed_all.py)
+[ ] /v1/home returns tracks for demo-user
+[ ] Cron: manual trigger on daily-drop after seed
+[ ] (Later) Vercel frontend + CORS + API URL env var
+```
+
+### 7.5 Repository structure (current)
 
 ```
 MoodAI_Spotify/
-├── data/source/tracks.xlsx
-├── scripts/                    # Phase 0 ✓
-├── sql/schema.sql              # Phase 0 ✓; extend in Phase 1
-├── services/
-│   ├── bff/                    # Phase 1
-│   ├── ranker/                 # Phase 1
-│   ├── orchestrator/           # Phase 1
-│   ├── llm-gateway/            # Phase 1
-│   └── drop-worker/            # Phase 1
-├── apps/
-│   └── web/                    # Phase 1 UI
+├── data/source/                # Music_Data.csv (local, gitignored)
+├── data/seed/v1/               # Sample + mood tag exports
+├── scripts/                    # Phase 0 pipeline + Render seed
+├── sql/schema.sql              # Base catalog schema
+├── phases/
+│   ├── phase-0/                # Data pipeline wrapper
+│   ├── phase-1/                # MVP API + drop worker
+│   ├── phase-2/                # Search, heard-before, prewarm
+│   ├── phase-3/                # Production API + static UI ✓
+│   │   ├── app/                # FastAPI BFF
+│   │   └── static/             # Stitch mobile UI → Vercel
+│   └── common/                 # Shared config, db, mood rules
+├── stitch_moodai_discovery_interface/  # Google Stitch design exports
 ├── docs/
 │   ├── problemstatement.md
-│   ├── architecture.md
-│   └── phasewiseimplementation.md
-├── docker-compose.yml
-├── render.yaml                 # Phase 1
+│   ├── architecture.md         # §12 Render + Vercel
+│   ├── phasewiseimplementation.md
+│   └── production-runbook.md   # Render step-by-step
+├── render.yaml                 # Render Blueprint (Phase 3 stack)
+├── runtime.txt                 # Python 3.11 for Render
+├── requirements-prod.txt     # Render build deps
+├── scripts/render_start.sh     # Render start command
+├── docker-compose.yml          # Local Postgres + Redis
 └── requirements.txt
 ```
 
@@ -438,7 +548,7 @@ MoodAI_Spotify/
 | **M1: Mood + Drop** | Week 4 of Phase 1 | Select mood → see 10-track drop with reasons |
 | **M2: MVP complete** | End of Phase 1 | Full home on Render; mood recalibration live |
 | **M3: Trust & Browse** | End of Phase 2 | Visual search + heard-before + push |
-| **M4: Production-ready** | End of Phase 3 | Smart defaults, load test, experiment results |
+| **M4: Production-ready** | End of Phase 3 | Render backend + real data; Vercel UI (optional) |
 
 **Total estimated duration:** 12–17 weeks (grad project pace).
 
@@ -458,6 +568,8 @@ MoodAI_Spotify/
 | Excel → Postgres pipeline | 0 | §6.5, README |
 | Smart mood default | 3 | §16 Phase 3 |
 | Metrics & experiments | 1 (instrument), 3 (full) | §14, problem §12 |
+| Render backend deploy | 1–3 | §12.3, §7.4, production-runbook |
+| Vercel frontend deploy | Post–Phase 3 | §12.4, §7.4.5 |
 
 ---
 
@@ -470,8 +582,9 @@ MoodAI_Spotify/
 [ ] GET /v1/discovery-drop returns 10 novel tracks with reasons
 [ ] No played track appears in drop (novelty filter)
 [ ] LLM explanation with template fallback on failure
-[ ] Deployed on Render with managed Postgres
-[ ] README updated with run instructions
+[ ] Deployed on Render with managed Postgres + real catalog seed
+[ ] README + production-runbook updated with Render steps
+[ ] (Later) Frontend on Vercel with API URL env var + CORS
 ```
 
 ---
@@ -481,7 +594,7 @@ MoodAI_Spotify/
 | Item | Suggested default | Decide by |
 |------|-------------------|-----------|
 | API language (Python vs Node) | Python FastAPI (matches scripts) | Phase 1 Week 1 |
-| Frontend (web vs mobile) | React web MVP | Phase 1 Week 1 |
+| Frontend (web vs mobile) | Stitch static UI on Vercel; API on Render | Phase 3 → Vercel |
 | LLM provider | Groq `llama-3.1-8b-instant` | Phase 1 Week 5 |
 | Adventurous at runtime | Ranker novelty_score + genre stretch (no dataset tag) | Phase 1 Week 2 |
 | Auth | Simple JWT / mock user for grad demo | Phase 1 Week 1 |
