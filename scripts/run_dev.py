@@ -52,7 +52,7 @@ def main() -> int:
     print("  MoodAI Spotify — Phase 3 (mobile UI)")
     print(f"  Open: {url}")
     print("  Do NOT use port 8000 if another project runs there.")
-    print("  Demo catalog loads automatically without Postgres.")
+    print("  Tip: python scripts/run_local_real.py  (real Music_Data.csv)")
     print("=" * 56)
 
     cmd = [

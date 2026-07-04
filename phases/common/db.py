@@ -24,7 +24,7 @@ def connect(url: str, connect_timeout: int = 10):
         import psycopg
 
         return psycopg.connect(url, connect_timeout=connect_timeout)
-    except ImportError:
+    except (ImportError, AttributeError, TypeError):
         import pg8000
 
         params = _parse_url(url)

@@ -51,6 +51,12 @@ def write_manifest(
     print(f"Wrote {path}")
 
 
+def _clip(value: Any, max_len: int) -> Any:
+    if value is None or not isinstance(value, str):
+        return value
+    return value[:max_len]
+
+
 def upsert_tracks(conn, df: pd.DataFrame) -> None:
     cols = [
         "track_id", "name", "artist_name", "album_name", "genre",
@@ -59,7 +65,25 @@ def upsert_tracks(conn, df: pd.DataFrame) -> None:
     for c in cols:
         if c not in df.columns:
             df[c] = None
-    rows = [tuple(row.get(c) for c in cols) for row in df.to_dict(orient="records")]
+    before = len(df)
+    df = df.drop_duplicates(subset=["track_id"], keep="last")
+    dropped = before - len(df)
+    if dropped:
+        print(f"Dropped {dropped} duplicate track_id rows before upsert")
+    rows = [
+        (
+            _clip(row.get("track_id"), 128),
+            _clip(row.get("name"), 512),
+            _clip(row.get("artist_name"), 512),
+            _clip(row.get("album_name"), 512),
+            _clip(row.get("genre"), 256),
+            row.get("energy"),
+            row.get("valence"),
+            row.get("tempo"),
+            row.get("instrumentalness"),
+        )
+        for row in df.to_dict(orient="records")
+    ]
     sql = """
         INSERT INTO tracks (track_id, name, artist_name, album_name, genre,
                             energy, valence, tempo, instrumentalness)
@@ -75,20 +99,32 @@ def upsert_tracks(conn, df: pd.DataFrame) -> None:
             instrumentalness = EXCLUDED.instrumentalness
     """
     with conn.cursor() as cur:
-        execute_values(cur, sql, rows)
-    conn.commit()
+        execute_values(cur, sql, rows, page_size=200, conn=conn)
 
 
-def upsert_mood_tags(conn, tags: pd.DataFrame) -> None:
+def _is_transient_db_error(exc: Exception) -> bool:
+    err = str(exc).lower()
+    return any(token in err for token in ("network", "ssl", "interface", "connection", "timeout"))
+
+
+def upsert_mood_tags(conn, tags: pd.DataFrame, url: str) -> None:
+    before = len(tags)
+    tags = tags.drop_duplicates(subset=["track_id"], keep="last")
+    dropped = before - len(tags)
+    if dropped:
+        print(f"Dropped {dropped} duplicate track_id rows before mood tag upsert")
+
+    use_psycopg = type(conn).__module__.startswith("psycopg")
+
     def mood_tags_value(raw) -> Any:
         items = list(raw) if raw is not None else []
-        if type(conn).__module__.startswith("psycopg"):
+        if use_psycopg:
             return items
         return to_pg_text_array(items)
 
     rows = [
         (
-            r.track_id,
+            _clip(r.track_id, 128),
             r.primary_mood,
             mood_tags_value(r.mood_tags),
             r.energy,
@@ -99,6 +135,17 @@ def upsert_mood_tags(conn, tags: pd.DataFrame) -> None:
         )
         for r in tags.itertuples(index=False)
     ]
+
+    with conn.cursor() as cur:
+        cur.execute("SELECT track_id FROM track_mood_tags")
+        existing = {row[0] for row in cur.fetchall()}
+    if existing:
+        print(f"Resuming mood tags: {len(existing)} already in database")
+        rows = [row for row in rows if row[0] not in existing]
+    if not rows:
+        print("Mood tags already complete.")
+        return
+
     sql = """
         INSERT INTO track_mood_tags
             (track_id, primary_mood, mood_tags, energy, valence, tempo,
@@ -114,9 +161,33 @@ def upsert_mood_tags(conn, tags: pd.DataFrame) -> None:
             dataset_version = EXCLUDED.dataset_version,
             tagged_at = NOW()
     """
-    with conn.cursor() as cur:
-        execute_values(cur, sql, rows)
-    conn.commit()
+    page_size = 100
+    total = len(existing) + len(rows)
+    done = len(existing)
+    index = 0
+    while index < len(rows):
+        chunk = rows[index : index + page_size]
+        for attempt in range(6):
+            try:
+                with conn.cursor() as cur:
+                    execute_values(cur, sql, chunk, page_size=len(chunk), conn=conn)
+                index += len(chunk)
+                done += len(chunk)
+                if done % 2000 < page_size or index >= len(rows):
+                    print(f"  ... {done}/{total} mood tags")
+                break
+            except Exception as exc:
+                if not _is_transient_db_error(exc) or attempt + 1 >= 6:
+                    raise
+                try:
+                    conn.close()
+                except Exception:
+                    pass
+                import time
+
+                time.sleep(min(30, 2 ** attempt))
+                conn = connect(url)
+                use_psycopg = type(conn).__module__.startswith("psycopg")
 
 
 def main() -> int:
@@ -132,6 +203,11 @@ def main() -> int:
         default=os.getenv("DATASET_VERSION", "v1.1.0"),
     )
     parser.add_argument("--dry-run", action="store_true", help="Tag only; no DB write")
+    parser.add_argument(
+        "--skip-tracks",
+        action="store_true",
+        help="Skip track upsert (resume mood tags only)",
+    )
     args = parser.parse_args()
 
     source = Path(args.source)
@@ -173,8 +249,9 @@ def main() -> int:
 
     conn = connect(url)
     try:
-        upsert_tracks(conn, tracks)
-        upsert_mood_tags(conn, tags)
+        if not args.skip_tracks:
+            upsert_tracks(conn, tracks)
+        upsert_mood_tags(conn, tags, url)
         print("Database load complete.")
     finally:
         conn.close()

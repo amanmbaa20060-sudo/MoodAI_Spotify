@@ -139,6 +139,7 @@ class Phase3Repository:
             drop = fetch_one_dict(cur)
             if drop is None:
                 return None
+            drop["drop_id"] = str(drop["drop_id"])
 
             cur.execute(
                 """

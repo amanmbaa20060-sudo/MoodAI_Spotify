@@ -23,7 +23,7 @@ def connect(url: str):
         import psycopg
 
         return psycopg.connect(url)
-    except ImportError:
+    except (ImportError, AttributeError, TypeError):
         import pg8000
 
         params = _parse_url(url)
@@ -48,6 +48,8 @@ def execute_values(
     sql: str,
     rows: Sequence[Sequence[Any]],
     page_size: int = 500,
+    conn=None,
+    retries: int = 3,
 ) -> None:
     """Insert many rows using VALUES %s placeholder."""
     if not rows:
@@ -60,10 +62,31 @@ def execute_values(
     suffix = sql[cols + 2 :]
     width = len(rows[0])
 
+    import time
+
     for i in range(0, len(rows), page_size):
         chunk = rows[i : i + page_size]
         placeholders = ", ".join(
             ["(" + ", ".join(["%s"] * width) + ")"] * len(chunk)
         )
         flat = [item for row in chunk for item in row]
-        cur.execute(prefix + placeholders + suffix, flat)
+        for attempt in range(retries):
+            try:
+                cur.execute(prefix + placeholders + suffix, flat)
+                if conn is not None:
+                    conn.commit()
+                break
+            except Exception as exc:
+                if attempt + 1 >= retries:
+                    raise
+                if conn is not None:
+                    try:
+                        conn.rollback()
+                    except Exception:
+                        pass
+                err = str(exc).lower()
+                if "network" not in err and "ssl" not in err and "interface" not in err:
+                    raise
+                time.sleep(2 ** attempt)
+        if conn is not None and (i + page_size) % (page_size * 20) == 0:
+            print(f"  ... {min(i + page_size, len(rows))}/{len(rows)} rows")

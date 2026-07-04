@@ -36,6 +36,7 @@ class GroqLLMGateway:
                 for track in tracks
             ],
         }
+        track_count = len(tracks)
         body = {
             "model": self.settings.groq_model,
             "temperature": 0.2,
@@ -46,7 +47,10 @@ class GroqLLMGateway:
                     "content": (
                         "You write short grounded music recommendation explanations. "
                         "Return strict JSON with keys header and reasons. "
-                        "Each reason must be under 60 characters and use only artist, genre, or mood from input."
+                        f"reasons must be an array of exactly {track_count} strings, "
+                        "one per track in the same order. "
+                        "Each reason must be under 60 characters and mention only "
+                        "the artist, genre, or mood from that track."
                     ),
                 },
                 {
@@ -62,6 +66,7 @@ class GroqLLMGateway:
             headers={
                 "Authorization": f"Bearer {self.settings.groq_api_key}",
                 "Content-Type": "application/json",
+                "User-Agent": "MoodAI/1.0",
             },
             method="POST",
         )
@@ -78,12 +83,35 @@ class GroqLLMGateway:
         return result
 
 
+def _batched(items: list[Any], size: int) -> list[list[Any]]:
+    return [items[i : i + size] for i in range(0, len(items), size)]
+
+
 class ExplanationService:
     def __init__(self, repository: Phase1Repository, settings: Settings, token_budget=None):
         self.repository = repository
         self.settings = settings
         self.gateway = GroqLLMGateway(settings)
         self.token_budget = token_budget
+
+    def _generate_explanations(self, mood: str, tracks: list[dict[str, Any]]) -> dict[str, Any]:
+        if len(tracks) <= 5:
+            result = self.gateway.generate_drop_explanations(mood, tracks)
+            if len(result.get("reasons", [])) != len(tracks):
+                raise RuntimeError("Unexpected reason count")
+            return result
+
+        header = ""
+        reasons: list[Any] = []
+        for batch in _batched(tracks, 5):
+            result = self.gateway.generate_drop_explanations(mood, batch)
+            batch_reasons = result.get("reasons", [])
+            if len(batch_reasons) != len(batch):
+                raise RuntimeError("Unexpected reason count")
+            if not header:
+                header = str(result.get("header") or "")
+            reasons.extend(batch_reasons)
+        return {"header": header, "reasons": reasons}
 
     @staticmethod
     def _feature_from_track(track: dict[str, Any], mood: str) -> tuple[str, dict[str, str]]:
@@ -117,6 +145,50 @@ class ExplanationService:
             )
         return header[:120], enriched
 
+    @staticmethod
+    def _normalize_reason(raw: Any) -> str:
+        if raw is None:
+            return ""
+        if isinstance(raw, str):
+            text = raw.strip()
+            if text.startswith("{") and text.endswith("}"):
+                try:
+                    import ast
+
+                    parsed = ast.literal_eval(text)
+                    if isinstance(parsed, dict):
+                        return ExplanationService._normalize_reason(parsed)
+                except (ValueError, SyntaxError):
+                    pass
+            return text
+        if isinstance(raw, dict):
+            for key in ("reason", "text", "explanation", "message"):
+                value = raw.get(key)
+                if isinstance(value, str) and value.strip():
+                    return value.strip()
+        return str(raw).strip()
+
+    @staticmethod
+    def _is_grounded(track: dict[str, Any], mood: str, reason_text: str) -> bool:
+        text = reason_text.lower()
+        if not text:
+            return False
+        mood_label = mood.lower().replace("_", " ")
+        if mood_label in text or mood.lower() in text:
+            return True
+        genre = track.get("genre")
+        if genre and str(genre).lower() in text:
+            return True
+        artist = track.get("artist_name")
+        if artist:
+            artist_lower = str(artist).lower()
+            if artist_lower in text or text in artist_lower:
+                return True
+            lead_artist = artist_lower.split(";")[0].strip()
+            if lead_artist and (lead_artist in text or text in lead_artist):
+                return True
+        return False
+
     def attach(self, user_id: str, mood: str, tracks: list[dict[str, Any]]) -> tuple[str, str, list[dict[str, Any]]]:
         prompt_hash = hashlib.sha256(
             json.dumps(
@@ -147,26 +219,25 @@ class ExplanationService:
             return header, "TEMPLATE", enriched
 
         try:
-            result = self.gateway.generate_drop_explanations(mood, tracks)
+            result = self._generate_explanations(mood, tracks)
             reasons = result["reasons"]
-            if len(reasons) != len(tracks):
-                raise RuntimeError("Unexpected reason count")
-
             enriched: list[dict[str, Any]] = []
+            llm_count = 0
             for track, reason in zip(tracks, reasons):
+                reason_text = self._normalize_reason(reason)
                 feature_id, payload = self._feature_from_track(track, mood)
-                grounded_values = [str(value).lower() for value in payload.values()]
-                grounded = any(value in str(reason).lower() for value in grounded_values)
-                if not grounded or len(str(reason)) > 60:
-                    reason = self._template_text(feature_id, payload)
+                grounded = self._is_grounded(track, mood, reason_text)
+                if not reason_text or not grounded or len(reason_text) > 60:
+                    reason_text = self._template_text(feature_id, payload)
                     method = "TEMPLATE"
                     grounded = True
                 else:
                     method = "LLM"
+                    llm_count += 1
                 enriched.append(
                     {
                         **track,
-                        "reason_text": str(reason),
+                        "reason_text": reason_text,
                         "reason_feature_id": feature_id,
                         "reason_method": method,
                     }
@@ -176,7 +247,7 @@ class ExplanationService:
                     user_id=user_id,
                     track_id=track["track_id"],
                     feature_id=feature_id,
-                    rendered_text=str(reason),
+                    rendered_text=reason_text,
                     generation_method=method,
                     model_id=self.settings.groq_model,
                     prompt_hash=prompt_hash,
@@ -185,7 +256,8 @@ class ExplanationService:
             header = str(result.get("header") or "")[:120] or f"Fresh picks for your {mood.title()} mood"
             if self.token_budget:
                 self.token_budget.record(user_id, estimated_tokens)
-            return header, "LLM", enriched
+            header_method = "LLM" if llm_count else "TEMPLATE"
+            return header, header_method, enriched
         except Exception:
             header, enriched = self._fallback(mood, tracks)
             for track in enriched:

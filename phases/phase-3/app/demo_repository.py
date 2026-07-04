@@ -50,6 +50,19 @@ class DemoRepository:
 
     @staticmethod
     def _load_catalog() -> list[dict[str, Any]]:
+        import os
+
+        catalog_path = os.getenv("MOODAI_CATALOG_CSV") or os.getenv("EXCEL_SOURCE_PATH")
+        if catalog_path:
+            path = Path(catalog_path)
+            if not path.is_absolute():
+                path = ROOT / path
+            if path.exists() and path.name.lower() != "sample_tracks.csv":
+                tracks = DemoRepository._load_from_catalog_file(path)
+                if tracks:
+                    print(f"MoodAI local catalog: loaded {len(tracks):,} tracks from {path.name}")
+                    return tracks
+
         if not SAMPLE_CATALOG.exists():
             return DemoRepository._synthetic_catalog()
 
@@ -76,6 +89,50 @@ class DemoRepository:
                         "base_rec_score": 0.7,
                     }
                 )
+        print(f"MoodAI local catalog: loaded {len(tracks):,} sample tracks")
+        return tracks
+
+    @staticmethod
+    def _load_from_catalog_file(path: Path) -> list[dict[str, Any]]:
+        import os
+
+        import pandas as pd
+
+        scripts_dir = ROOT / "scripts"
+        if str(scripts_dir) not in sys.path:
+            sys.path.insert(0, str(scripts_dir))
+        from build_mood_buckets import normalize_columns, tag_tracks  # noqa: WPS433
+
+        df = pd.read_csv(path)
+        df = normalize_columns(df)
+        tagged = tag_tracks(df, os.getenv("DATASET_VERSION", "local"))
+        tag_by_id = {str(row["track_id"]): row for row in tagged.to_dict(orient="records")}
+
+        tracks: list[dict[str, Any]] = []
+        for row in df.to_dict(orient="records"):
+            track_id = str(row["track_id"])
+            tag = tag_by_id.get(track_id)
+            if tag is None:
+                continue
+            artist = str(row.get("artist_name") or "Unknown")
+            if ";" in artist:
+                artist = artist.split(";")[0].strip()
+            tracks.append(
+                {
+                    "track_id": track_id,
+                    "title": str(row.get("name") or "Unknown"),
+                    "artist_name": artist,
+                    "album_name": str(row.get("album_name") or ""),
+                    "genre": str(row.get("genre") or ""),
+                    "primary_mood": tag["primary_mood"] or "LOW_KEY",
+                    "mood_tags": tag["mood_tags"] or ["LOW_KEY"],
+                    "energy": float(row["energy"]),
+                    "valence": float(row["valence"]),
+                    "tempo": float(row["tempo"]),
+                    "instrumentalness": float(row["instrumentalness"]),
+                    "base_rec_score": 0.7,
+                }
+            )
         return tracks
 
     @staticmethod
