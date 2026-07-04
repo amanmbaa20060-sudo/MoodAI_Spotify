@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="application-name" content="MoodAI Spotify" />
+    <meta name="description" content="MoodAI Spotify — mood-first music discovery" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>MoodAI — Discovery</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-fixed": "#6bff8f",
+              tertiary: "#ffb5ab",
+              "surface-tint": "#4ae176",
+              "on-error-container": "#ffdad6",
+              "on-primary-fixed": "#002109",
+              "on-primary": "#003915",
+              "secondary-fixed-dim": "#7bd0ff",
+              "surface-container-highest": "#2f372e",
+              "on-tertiary-fixed": "#410001",
+              background: "#0e150e",
+              "on-primary-container": "#004b1e",
+              "on-secondary-container": "#00374d",
+              "on-surface-variant": "#bccbb9",
+              "on-tertiary-fixed-variant": "#7f2a21",
+              "tertiary-fixed": "#ffdad5",
+              "tertiary-container": "#ff8b7c",
+              "outline-variant": "#3d4a3d",
+              "surface-container-high": "#242c24",
+              "on-secondary": "#00354a",
+              "primary-container": "#22c55e",
+              "on-error": "#690005",
+              "on-secondary-fixed": "#001e2c",
+              "inverse-on-surface": "#2a322a",
+              "inverse-primary": "#006e2f",
+              "surface-dim": "#0e150e",
+              primary: "#4be277",
+              surface: "#0e150e",
+              "error-container": "#93000a",
+              "on-tertiary-container": "#76231b",
+              "on-primary-fixed-variant": "#005321",
+              outline: "#869585",
+              "secondary-container": "#00a6e0",
+              "on-surface": "#dce5d9",
+              "primary-fixed-dim": "#4ae176",
+              "tertiary-fixed-dim": "#ffb4a9",
+              error: "#ffb4ab",
+              "surface-container-low": "#161d16",
+              "on-tertiary": "#60130d",
+              "on-secondary-fixed-variant": "#004c69",
+              "on-background": "#dce5d9",
+              "surface-container-lowest": "#091009",
+              "surface-container": "#1a221a",
+              "surface-bright": "#333b33",
+              "inverse-surface": "#dce5d9",
+              "surface-variant": "#2f372e",
+              secondary: "#7bd0ff",
+              "secondary-fixed": "#c4e7ff",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              "container-padding-desktop": "2.5rem",
+              "stack-sm": "0.5rem",
+              gutter: "1.5rem",
+              "stack-lg": "2rem",
+              base: "8px",
+              "stack-md": "1rem",
+              "container-padding-mobile": "1.25rem",
+            },
+            fontFamily: {
+              "body-lg": ["Inter", "sans-serif"],
+              "label-caps": ["JetBrains Mono", "monospace"],
+              caption: ["Inter", "sans-serif"],
+              "display-lg": ["Inter", "sans-serif"],
+              "display-lg-mobile": ["Inter", "sans-serif"],
+              "body-md": ["Inter", "sans-serif"],
+              "body-sm": ["Inter", "sans-serif"],
+              "headline-md": ["Inter", "sans-serif"],
+            },
+            fontSize: {
+              "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+              "label-caps": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+              caption: ["12px", { lineHeight: "16px", fontWeight: "400" }],
+              "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "800" }],
+              "display-lg-mobile": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "800" }],
+              "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+              "body-sm": ["14px", { lineHeight: "20px", fontWeight: "500" }],
+              "headline-md": ["24px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "700" }],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+      }
+      body {
+        background-color: #0e150e;
+        color: #dce5d9;
+        -webkit-font-smoothing: antialiased;
+        min-height: max(100dvh, 100vh);
+      }
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .glass-card {
+        background: rgba(26, 34, 26, 0.75);
+        backdrop-filter: blur(12px);
+        border: 1px solid #3d4a3d;
+      }
+      .artist-glow:hover {
+        box-shadow: 0 0 20px -5px rgba(34, 197, 94, 0.3);
+      }
+      .luminous-shadow {
+        box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
+      }
+      .pb-safe {
+        padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+      }
+      .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .content-locked {
+        filter: blur(10px);
+        pointer-events: none;
+        user-select: none;
+        transition: filter 0.4s ease;
+      }
+      .content-unlocked {
+        filter: blur(0);
+        pointer-events: auto;
+        user-select: auto;
+      }
+      .lock-overlay {
+        background: linear-gradient(
+          180deg,
+          rgba(14, 21, 14, 0.35) 0%,
+          rgba(14, 21, 14, 0.72) 45%,
+          rgba(14, 21, 14, 0.88) 100%
+        );
+        backdrop-filter: blur(2px);
+      }
+    </style>
+  </head>
+  <body class="font-body-md text-body-md overflow-x-hidden pb-28">
+    <!-- Header -->
+    <header
+      id="app-header"
+      class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl transition-shadow"
+    >
+      <div class="flex items-center justify-between px-container-padding-mobile h-16 max-w-lg mx-auto w-full">
+        <div class="flex items-center gap-3 min-w-0 flex-1">
+          <button
+            type="button"
+            id="header-back-btn"
+            class="hidden w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors active:scale-95 flex-shrink-0"
+            aria-label="Back to home"
+          >
+            <span class="material-symbols-outlined text-[24px]">arrow_back</span>
+          </button>
+          <div class="flex flex-col min-w-0">
+            <span class="font-display-lg text-display-lg-mobile tracking-tighter text-primary">MoodAI</span>
+            <span id="greeting" class="text-caption font-caption text-on-surface-variant -mt-1 truncate">Good evening</span>
+          </div>
+        </div>
+        <div
+          class="w-10 h-10 rounded-full border border-outline-variant overflow-hidden bg-surface-container-high flex items-center justify-center"
+        >
+          <span class="material-symbols-outlined text-primary text-xl">person</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Home -->
+    <main id="view-home" class="pt-24 px-container-padding-mobile max-w-lg mx-auto w-full space-y-stack-lg">
+      <div id="home-content" class="space-y-stack-lg transition-opacity duration-300"></div>
+    </main>
+
+    <!-- Search -->
+    <main
+      id="view-search"
+      class="hidden pt-24 pb-32 px-container-padding-mobile max-w-lg mx-auto w-full"
+    >
+      <div class="relative mb-stack-lg group">
+        <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+          <span class="material-symbols-outlined text-on-surface-variant group-focus-within:text-primary transition-colors"
+            >search</span
+          >
+        </div>
+        <input
+          id="search-input"
+          type="search"
+          autocomplete="off"
+          class="w-full h-14 pl-12 pr-6 rounded-full bg-surface-container-low border border-outline-variant text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-body-md"
+          placeholder="Search artists..."
+        />
+      </div>
+
+      <div class="flex items-center justify-between mb-gutter">
+        <h2 class="font-headline-md text-headline-md text-on-surface">Top Results</h2>
+        <span class="font-label-caps text-label-caps text-primary">Artists</span>
+      </div>
+
+      <div id="search-loading" class="hidden animate-pulse grid grid-cols-2 gap-gutter">
+        <div class="h-52 bg-surface-container rounded-xl"></div>
+        <div class="h-52 bg-surface-container rounded-xl"></div>
+      </div>
+
+      <div id="search-empty" class="hidden flex flex-col items-center justify-center py-20 text-center"></div>
+
+      <div id="search-results" class="grid grid-cols-2 gap-gutter"></div>
+
+      <div
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none -z-10"
+      ></div>
+    </main>
+
+    <!-- Artist detail -->
+    <main
+      id="view-artist"
+      class="hidden pt-24 pb-32 px-container-padding-mobile max-w-lg mx-auto w-full"
+    >
+      <div id="artist-content" class="space-y-stack-lg"></div>
+    </main>
+
+    <!-- Library placeholder -->
+    <main
+      id="view-library"
+      class="hidden pt-24 px-container-padding-mobile max-w-lg mx-auto w-full text-center py-20"
+    >
+      <span class="material-symbols-outlined text-6xl text-on-surface-variant mb-4">library_music</span>
+      <h2 class="font-headline-md text-headline-md mb-2">Your Library</h2>
+      <p class="text-on-surface-variant font-body-md">Saved tracks from Discovery Drops will appear here.</p>
+    </main>
+
+    <!-- Heard-before bottom sheet -->
+    <div
+      id="sheet-backdrop"
+      class="fixed inset-0 bg-black/60 z-[60] opacity-0 pointer-events-none transition-opacity"
+    ></div>
+    <div
+      id="heard-before-sheet"
+      class="fixed bottom-0 left-0 right-0 z-[70] bg-surface-container border-t border-outline-variant rounded-t-3xl p-6 pb-safe translate-y-full pointer-events-none transition-transform duration-300 max-w-lg mx-auto"
+    >
+      <div class="w-12 h-1 bg-outline-variant rounded-full mx-auto mb-6"></div>
+      <h3 class="font-headline-md text-headline-md mb-2">Already know this one?</h3>
+      <p class="font-body-md text-on-surface-variant mb-1">
+        <span id="heard-before-track-title" class="text-on-surface font-bold"></span>
+      </p>
+      <p class="font-body-sm text-on-surface-variant mb-8">We'll avoid showing this track in future drops.</p>
+      <div class="flex gap-3">
+        <button
+          id="heard-before-cancel"
+          type="button"
+          class="flex-1 py-3 rounded-full border border-outline-variant text-on-surface font-bold active:scale-95 transition-transform"
+        >
+          Cancel
+        </button>
+        <button
+          id="heard-before-confirm"
+          type="button"
+          class="flex-1 py-3 rounded-full bg-primary text-on-primary font-bold active:scale-95 transition-transform"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+
+    <!-- Mini player -->
+    <div
+      id="mini-player"
+      class="fixed bottom-24 left-1/2 -translate-x-1/2 w-[calc(100%-2.5rem)] max-w-lg glass-card rounded-2xl p-3 flex items-center gap-4 z-40 shadow-2xl translate-y-full opacity-0 pointer-events-none transition-all"
+    >
+      <div id="mini-player-art" class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0"></div>
+      <div class="flex-grow min-w-0">
+        <p id="mini-player-title" class="font-body-sm text-on-surface truncate"></p>
+        <p id="mini-player-artist" class="font-caption text-on-surface-variant text-[10px] truncate"></p>
+      </div>
+      <button
+        type="button"
+        class="w-10 h-10 rounded-full bg-primary text-on-primary-container flex items-center justify-center"
+        aria-label="Play"
+      >
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">play_arrow</span>
+      </button>
+    </div>
+
+    <!-- Toast -->
+    <div
+      id="toast"
+      class="fixed top-20 left-1/2 -translate-x-1/2 z-[80] px-5 py-3 rounded-full bg-surface-container-highest border border-outline-variant text-on-surface font-body-sm shadow-xl opacity-0 translate-y-4 pointer-events-none transition-all max-w-[90vw] text-center"
+    ></div>
+
+    <!-- Bottom nav -->
+    <nav
+      class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-lg border-t border-outline-variant shadow-lg py-3 px-6 pb-safe"
+    >
+      <div class="flex justify-around items-center max-w-lg mx-auto">
+        <button type="button" data-nav="home" class="flex flex-col items-center justify-center text-primary font-bold active:scale-90 transition-all">
+          <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1">home</span>
+          <span class="font-label-caps text-[10px] mt-1 tracking-tight">Home</span>
+        </button>
+        <button type="button" data-nav="search" class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-all">
+          <span class="material-symbols-outlined text-[24px]">search</span>
+          <span class="font-label-caps text-[10px] mt-1 tracking-tight">Search</span>
+        </button>
+        <button type="button" data-nav="library" class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-all">
+          <span class="material-symbols-outlined text-[24px]">library_music</span>
+          <span class="font-label-caps text-[10px] mt-1 tracking-tight">Library</span>
+        </button>
+      </div>
+    </nav>
+
+    <script src="/config.js"></script>
+    <script src="/assets/app.js?v=9" defer></script>
+  </body>
+</html>

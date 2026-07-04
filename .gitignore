@@ -22,6 +22,7 @@ Thumbs.db
 # Logs
 *.log
 
-# Vercel static build output
+# Vercel static build output (config.js is regenerated each deploy)
+public/config.js
 dist/
 phases/phase-3/static/dist/
