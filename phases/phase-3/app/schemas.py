@@ -78,6 +78,24 @@ class ArtistSearchResponse(BaseModel):
     artists: list[ArtistGridItem]
 
 
+class ArtistTrackItem(BaseModel):
+    track_id: str
+    title: str
+    artists: list[str]
+    album_name: str | None = None
+    genre: str | None = None
+
+
+class ArtistDetailResponse(BaseModel):
+    artist_id: str
+    name: str
+    image_url: str
+    image_alt: str
+    track_count: int
+    top_genre: str | None = None
+    tracks: list[ArtistTrackItem]
+
+
 class HeardBeforeRequest(BaseModel):
     drop_id: str | None = None
 

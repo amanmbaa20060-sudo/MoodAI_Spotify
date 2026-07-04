@@ -6,7 +6,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, Query
+from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -32,6 +32,7 @@ from .push import PushNotificationService
 from .ranker import MoodAwareRanker
 from .repository import Phase3Repository
 from .schemas import (
+    ArtistDetailResponse,
     ArtistSearchResponse,
     DiscoveryDropPayload,
     ExplanationAuditItem,
@@ -261,6 +262,28 @@ def create_app(services: tuple | None = None) -> FastAPI:
     ) -> dict:
         artists = app.state.search.search_artists(q, limit=limit)
         return {"query": q, "user_id": user_id, "artists": artists}
+
+    @app.get("/v1/artists/lookup/by-name", response_model=ArtistDetailResponse)
+    def get_artist_by_name(
+        name: str = Query(..., min_length=1),
+        limit: int = Query(100, ge=1, le=200),
+        user_id: str = Depends(get_user_id),
+    ) -> dict:
+        artist = app.state.search.get_artist_by_name(name, limit=limit)
+        if artist is None:
+            raise HTTPException(status_code=404, detail="Artist not found")
+        return artist
+
+    @app.get("/v1/artists/{artist_id}", response_model=ArtistDetailResponse)
+    def get_artist(
+        artist_id: str,
+        limit: int = Query(100, ge=1, le=200),
+        user_id: str = Depends(get_user_id),
+    ) -> dict:
+        artist = app.state.search.get_artist(artist_id, limit=limit)
+        if artist is None:
+            raise HTTPException(status_code=404, detail="Artist not found")
+        return artist
 
     @app.post(
         "/v1/discovery-drop/tracks/{track_id}/heard-before",

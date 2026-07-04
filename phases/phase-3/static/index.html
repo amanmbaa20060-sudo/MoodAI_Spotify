@@ -147,6 +147,26 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
+      .content-locked {
+        filter: blur(10px);
+        pointer-events: none;
+        user-select: none;
+        transition: filter 0.4s ease;
+      }
+      .content-unlocked {
+        filter: blur(0);
+        pointer-events: auto;
+        user-select: auto;
+      }
+      .lock-overlay {
+        background: linear-gradient(
+          180deg,
+          rgba(14, 21, 14, 0.35) 0%,
+          rgba(14, 21, 14, 0.72) 45%,
+          rgba(14, 21, 14, 0.88) 100%
+        );
+        backdrop-filter: blur(2px);
+      }
     </style>
   </head>
   <body class="font-body-md text-body-md overflow-x-hidden pb-28">
@@ -156,9 +176,19 @@
       class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl transition-shadow"
     >
       <div class="flex items-center justify-between px-container-padding-mobile h-16 max-w-lg mx-auto w-full">
-        <div class="flex flex-col">
-          <span class="font-display-lg text-display-lg-mobile tracking-tighter text-primary">MoodAI</span>
-          <span id="greeting" class="text-caption font-caption text-on-surface-variant -mt-1">Good evening</span>
+        <div class="flex items-center gap-3 min-w-0 flex-1">
+          <button
+            type="button"
+            id="header-back-btn"
+            class="hidden w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors active:scale-95 flex-shrink-0"
+            aria-label="Back to home"
+          >
+            <span class="material-symbols-outlined text-[24px]">arrow_back</span>
+          </button>
+          <div class="flex flex-col min-w-0">
+            <span class="font-display-lg text-display-lg-mobile tracking-tighter text-primary">MoodAI</span>
+            <span id="greeting" class="text-caption font-caption text-on-surface-variant -mt-1 truncate">Good evening</span>
+          </div>
         </div>
         <div
           class="w-10 h-10 rounded-full border border-outline-variant overflow-hidden bg-surface-container-high flex items-center justify-center"
@@ -210,6 +240,14 @@
       <div
         class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none -z-10"
       ></div>
+    </main>
+
+    <!-- Artist detail -->
+    <main
+      id="view-artist"
+      class="hidden pt-24 pb-32 px-container-padding-mobile max-w-lg mx-auto w-full"
+    >
+      <div id="artist-content" class="space-y-stack-lg"></div>
     </main>
 
     <!-- Library placeholder -->
@@ -300,6 +338,6 @@
       </div>
     </nav>
 
-    <script src="/assets/app.js?v=4" defer></script>
+    <script src="/assets/app.js?v=8" defer></script>
   </body>
 </html>

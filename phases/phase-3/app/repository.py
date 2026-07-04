@@ -299,6 +299,46 @@ class Phase3Repository:
             )
             return fetch_all_dicts(cur)
 
+    def get_artist_with_tracks(
+        self, artist_id: str, limit: int = 100
+    ) -> dict[str, Any] | None:
+        with get_connection(self.database_url) as conn, conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT
+                    MD5(LOWER(COALESCE(t.artist_name, 'unknown'))) AS artist_id,
+                    t.artist_name,
+                    MAX(t.artist_image_url) AS artist_image_url,
+                    COUNT(*)::INT AS track_count,
+                    MODE() WITHIN GROUP (ORDER BY t.genre) AS top_genre
+                FROM tracks t
+                WHERE MD5(LOWER(COALESCE(t.artist_name, 'unknown'))) = %s
+                GROUP BY t.artist_name
+                """,
+                (artist_id,),
+            )
+            artist = fetch_one_dict(cur)
+            if artist is None:
+                return None
+
+            cur.execute(
+                """
+                SELECT
+                    track_id,
+                    name AS title,
+                    artist_name,
+                    album_name,
+                    genre
+                FROM tracks
+                WHERE MD5(LOWER(COALESCE(artist_name, 'unknown'))) = %s
+                ORDER BY name ASC
+                LIMIT %s
+                """,
+                (artist_id, limit),
+            )
+            artist["tracks"] = fetch_all_dicts(cur)
+            return artist
+
     def record_heard_before(
         self, user_id: str, track_id: str, drop_id: str | None
     ) -> str:

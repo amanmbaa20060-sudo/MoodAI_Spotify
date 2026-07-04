@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import sys
 import uuid
 from datetime import date, datetime, timedelta, timezone
@@ -33,6 +34,10 @@ def should_use_demo_mode(database_url: str) -> bool:
 
 class DemoRepository:
     """Serves bundled sample catalog data without PostgreSQL."""
+
+    @staticmethod
+    def _artist_id(name: str) -> str:
+        return hashlib.md5((name or "unknown").lower().encode("utf-8")).hexdigest()
 
     def __init__(self) -> None:
         self._moods: dict[str, str] = {}
@@ -187,7 +192,7 @@ class DemoRepository:
             bucket = artists.setdefault(
                 name,
                 {
-                    "artist_id": name.lower().replace(" ", "-"),
+                    "artist_id": self._artist_id(name),
                     "artist_name": name,
                     "track_count": 0,
                     "top_genre": track.get("genre"),
@@ -196,6 +201,45 @@ class DemoRepository:
             bucket["track_count"] += 1
         rows = sorted(artists.values(), key=lambda row: (-row["track_count"], row["artist_name"]))
         return rows[:limit]
+
+    def get_artist_with_tracks(
+        self, artist_id: str, limit: int = 100
+    ) -> dict[str, Any] | None:
+        matched_name: str | None = None
+        tracks: list[dict[str, Any]] = []
+        genres: dict[str, int] = {}
+
+        for track in self._tracks:
+            name = track["artist_name"] or "Unknown"
+            if self._artist_id(name) != artist_id:
+                continue
+            matched_name = name
+            genre = track.get("genre")
+            if genre:
+                genres[genre] = genres.get(genre, 0) + 1
+            tracks.append(
+                {
+                    "track_id": track["track_id"],
+                    "title": track["title"],
+                    "artist_name": name,
+                    "album_name": track.get("album_name"),
+                    "genre": genre,
+                }
+            )
+
+        if matched_name is None:
+            return None
+
+        tracks.sort(key=lambda row: row["title"])
+        top_genre = max(genres, key=genres.get) if genres else None
+        return {
+            "artist_id": artist_id,
+            "artist_name": matched_name,
+            "artist_image_url": None,
+            "track_count": len(tracks),
+            "top_genre": top_genre,
+            "tracks": tracks[:limit],
+        }
 
     def record_heard_before(
         self, user_id: str, track_id: str, drop_id: str | None = None
