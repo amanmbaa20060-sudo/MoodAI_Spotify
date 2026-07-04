@@ -851,12 +851,28 @@ function bindShellEvents() {
   });
 }
 
+function isLocalDev() {
+  const host = window.location.hostname;
+  return host === "localhost" || host === "127.0.0.1";
+}
+
 async function init() {
   bindShellEvents();
   setView("home");
 
+  if (!API_BASE && !isLocalDev()) {
+    showWrongAppScreen(
+      "Production API URL is missing. In Vercel → Settings → Environment Variables, set MOODAI_API_URL to your Render API URL (e.g. https://moodai-api.onrender.com), then redeploy."
+    );
+    return;
+  }
+
   try {
-    const health = await fetch(`${API_BASE}/healthz`).then((response) => response.json());
+    const response = await fetch(`${API_BASE}/healthz`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const health = await response.json();
     if (health.product !== "MoodAI Spotify" || health.phase !== "3") {
       showWrongAppScreen();
       return;
@@ -865,9 +881,15 @@ async function init() {
       document.getElementById("greeting").textContent = `${greeting()} · Demo catalog`;
     }
   } catch {
-    showWrongAppScreen(
-      "Could not verify MoodAI API. You may be on the wrong port (e.g. 8000 is often another app)."
-    );
+    if (isLocalDev()) {
+      showWrongAppScreen(
+        "Could not verify MoodAI API. Run: python scripts/run_local_real.py and open the URL it prints (usually http://127.0.0.1:8010/)."
+      );
+    } else {
+      showWrongAppScreen(
+        `Cannot reach the MoodAI API at ${API_BASE}. Check that your Render service is running (open ${API_BASE}/healthz in a browser), MOODAI_API_URL is set on Vercel, and CORS_ALLOW_VERCEL=true on Render.`
+      );
+    }
     return;
   }
 
@@ -877,13 +899,18 @@ async function init() {
 function showWrongAppScreen(message) {
   const text =
     message ||
-    "This URL is not MoodAI. Port 8000 may be another project (e.g. AI Travel Planner). Run: python scripts/run_dev.py and open http://127.0.0.1:8010/";
+    (isLocalDev()
+      ? "This URL is not MoodAI. Run: python scripts/run_local_real.py"
+      : "MoodAI production API is not reachable. Verify Render deploy and Vercel MOODAI_API_URL.");
+  const action = isLocalDev()
+    ? `<a href="http://127.0.0.1:8010/" class="inline-block px-6 py-3 rounded-full bg-primary text-on-primary font-bold">Open local MoodAI</a>`
+    : `<p class="text-on-surface-variant font-body-sm text-left max-w-sm mx-auto">1. Render Dashboard → your web service → copy URL<br>2. Vercel → Settings → Environment Variables → <code>MOODAI_API_URL</code><br>3. Render → <code>CORS_ALLOW_VERCEL=true</code> and <code>GROQ_API_KEY</code><br>4. Redeploy both services</p>`;
   document.getElementById("home-content").innerHTML = `
     <div class="text-center py-16 space-y-4 px-4">
       <span class="material-symbols-outlined text-5xl text-tertiary">wrong_location</span>
-      <h3 class="font-headline-md text-headline-md">Wrong app on this port</h3>
+      <h3 class="font-headline-md text-headline-md">${isLocalDev() ? "Wrong app on this port" : "Production API not connected"}</h3>
       <p class="text-on-surface-variant font-body-sm">${escapeHtml(text)}</p>
-      <a href="http://127.0.0.1:8010/" class="inline-block px-6 py-3 rounded-full bg-primary text-on-primary font-bold">Open MoodAI on :8010</a>
+      ${action}
     </div>`;
   document.getElementById("view-search").classList.add("hidden");
   document.getElementById("view-library").classList.add("hidden");

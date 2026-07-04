@@ -11,6 +11,17 @@ const src = path.join(root, "phases", "phase-3", "static");
 const out = path.join(root, "public");
 const apiUrl = (process.env.MOODAI_API_URL || "").replace(/\/$/, "");
 
+if (process.env.VERCEL === "1" && !apiUrl) {
+  console.error(
+    "\nMOODAI_API_URL is required on Vercel.\n" +
+      "  Vercel → Project → Settings → Environment Variables\n" +
+      "  Name:  MOODAI_API_URL\n" +
+      "  Value: https://YOUR-SERVICE.onrender.com\n" +
+      "Then redeploy.\n"
+  );
+  process.exit(1);
+}
+
 fs.mkdirSync(path.join(out, "assets"), { recursive: true });
 
 const indexSrc = path.join(src, "index.html");

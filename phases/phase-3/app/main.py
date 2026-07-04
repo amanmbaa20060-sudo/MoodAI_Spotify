@@ -140,22 +140,23 @@ def create_app(services: tuple | None = None) -> FastAPI:
         for origin in settings.cors_origins.split(",")
         if origin.strip()
     ]
-    if cors_origins:
-        app.add_middleware(
-            CORSMiddleware,
-            allow_origins=cors_origins,
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*", "X-User-Id"],
-        )
-    elif os.getenv("CORS_ALLOW_VERCEL", "").lower() in {"1", "true", "yes", "on"}:
-        app.add_middleware(
-            CORSMiddleware,
-            allow_origin_regex=r"https://.*\.vercel\.app",
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*", "X-User-Id"],
-        )
+    allow_vercel = os.getenv("CORS_ALLOW_VERCEL", "").lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+    if cors_origins or allow_vercel:
+        cors_kwargs: dict = {
+            "allow_credentials": True,
+            "allow_methods": ["*"],
+            "allow_headers": ["*", "X-User-Id"],
+        }
+        if cors_origins:
+            cors_kwargs["allow_origins"] = cors_origins
+        if allow_vercel:
+            cors_kwargs["allow_origin_regex"] = r"https://.*\.vercel\.app"
+        app.add_middleware(CORSMiddleware, **cors_kwargs)
 
     for name, value in (
         ("settings", settings),

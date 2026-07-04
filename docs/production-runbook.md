@@ -99,7 +99,7 @@ Open your Render web service URL (e.g. `https://moodai-api.onrender.com`).
 
 | Check | URL / command |
 |-------|----------------|
-| Health | `GET /healthz` → `{"status":"ok","phase":"3"}` |
+| Health | `GET /healthz` → `{"status":"ok","phase":"3","product":"MoodAI Spotify"}` |
 | Web UI | `GET /` |
 | Home | `GET /v1/home` with header `X-User-Id: demo-user` |
 | Mood | `PUT /v1/users/me/mood` |
@@ -114,7 +114,70 @@ curl -s https://YOUR-SERVICE.onrender.com/healthz
 curl -s -H "X-User-Id: demo-user" https://YOUR-SERVICE.onrender.com/v1/home
 ```
 
-## Step 5 — Environment variables (Render dashboard)
+## Step 5 — Deploy frontend on Vercel (production UI)
+
+The Vercel site is **static only**. It calls your **Render API** at runtime via `config.js`.
+
+### Vercel project settings
+
+| Setting | Value |
+|---------|--------|
+| Root Directory | *(empty — repo root)* |
+| Framework Preset | **Other** |
+| Build Command | `node build.mjs` |
+| Output Directory | `public` |
+
+### Required Vercel environment variable
+
+| Name | Value | Environments |
+|------|--------|--------------|
+| **`MOODAI_API_URL`** | `https://YOUR-SERVICE.onrender.com` | Production, Preview, Development |
+
+No trailing slash. Example: `https://moodai-api.onrender.com`
+
+The build writes this into `public/config.js`:
+
+```js
+window.__MOODAI_CONFIG__ = { apiBaseUrl: "https://YOUR-SERVICE.onrender.com" };
+```
+
+If `MOODAI_API_URL` is missing, the Vercel build **fails** (by design) so you never deploy a broken frontend.
+
+### Required Render environment variables (for Vercel)
+
+On **`moodai-api`** in Render:
+
+| Variable | Value |
+|----------|--------|
+| **`CORS_ALLOW_VERCEL`** | `true` |
+| **`GROQ_API_KEY`** | your Groq key (for LLM explanations) |
+| **`DATABASE_URL`** | linked Postgres (catalog must be seeded) |
+
+Optional — custom Vercel domain (not `*.vercel.app`):
+
+| Variable | Example |
+|----------|---------|
+| **`CORS_ORIGINS`** | `https://moodai.yourdomain.com` |
+
+You can set both `CORS_ALLOW_VERCEL=true` and `CORS_ORIGINS` (comma-separated).
+
+### Verify end-to-end
+
+1. Browser: `https://YOUR-SERVICE.onrender.com/healthz` → JSON with `"product":"MoodAI Spotify"`
+2. Vercel → **Deployments** → latest build log shows `API=https://YOUR-SERVICE.onrender.com`
+3. Open your Vercel URL → home feed loads (not “Production API not connected”)
+
+### Vercel troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| “Could not verify MoodAI API” / “Production API not connected” | Set `MOODAI_API_URL` on Vercel → **Redeploy** |
+| Build fails: `MOODAI_API_URL is required` | Add env var in Vercel → Settings → Environment Variables |
+| UI loads but API calls fail (browser console CORS error) | Set `CORS_ALLOW_VERCEL=true` on Render; redeploy API |
+| API works on Render `/` but Vercel UI empty | Seed Postgres (Step 3); check Render logs |
+| `mode: demo` in `/healthz` | Do **not** set `MOODAI_DEMO_MODE=true` on Render; ensure `DATABASE_URL` is set |
+
+## Step 6 — Environment variables (Render dashboard)
 
 | Variable | Required | Notes |
 |----------|----------|-------|
@@ -126,6 +189,8 @@ curl -s -H "X-User-Id: demo-user" https://YOUR-SERVICE.onrender.com/v1/home
 | `SMART_MOOD_DEFAULT_ENABLED` | No | `true` in blueprint |
 | `HOME_CACHE_TTL_SECONDS` | No | `60` |
 | `LLM_TOKEN_BUDGET_PER_DAY` | No | `5000` |
+| `CORS_ALLOW_VERCEL` | Yes (if using Vercel UI) | `true` |
+| `CORS_ORIGINS` | No | Custom Vercel domain, comma-separated |
 
 ## Cron jobs
 
