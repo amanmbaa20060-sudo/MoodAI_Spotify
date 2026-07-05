@@ -25,6 +25,20 @@ class HomeFeedComposer:
         self.ranker = ranker
         self.explanations = explanations
 
+    @staticmethod
+    def _template_fresh_tracks(active_mood: str, tracks: list[dict]) -> list[dict]:
+        """Fresh picks use lightweight templates — reserve LLM budget for Discovery Drop."""
+        mood_label = active_mood.title().replace("_", " ")
+        return [
+            {
+                **track,
+                "reason_text": f"Fits your {mood_label} session",
+                "reason_feature_id": "MOOD_MATCH",
+                "reason_method": "TEMPLATE",
+            }
+            for track in tracks
+        ]
+
     def compose(
         self,
         user_id: str,
@@ -37,18 +51,7 @@ class HomeFeedComposer:
 
         fresh_candidates = self.repository.fetch_candidates(active_mood, limit=60)
         fresh_scored = self.ranker.score(fresh_candidates, active_mood)[:20]
-        if self.explanations:
-            _, _, fresh_tracks = self.explanations.attach(user_id, active_mood, fresh_scored)
-        else:
-            fresh_tracks = [
-                {
-                    **track,
-                    "reason_text": f"Fits your {active_mood.title()} session",
-                    "reason_feature_id": "MOOD_MATCH",
-                    "reason_method": "TEMPLATE",
-                }
-                for track in fresh_scored
-            ]
+        fresh_tracks = self._template_fresh_tracks(active_mood, fresh_scored)
 
         return {
             "user_id": user_id,

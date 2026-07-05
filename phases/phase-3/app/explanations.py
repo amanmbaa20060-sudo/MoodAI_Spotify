@@ -71,7 +71,7 @@ class GroqLLMGateway:
             method="POST",
         )
         try:
-            with request.urlopen(req, timeout=15) as response:
+            with request.urlopen(req, timeout=45) as response:
                 raw = json.loads(response.read().decode("utf-8"))
         except (error.URLError, TimeoutError, json.JSONDecodeError) as exc:
             raise RuntimeError("Groq request failed") from exc
@@ -201,7 +201,7 @@ class ExplanationService:
             ).encode("utf-8")
         ).hexdigest()
 
-        estimated_tokens = len(tracks) * 120
+        estimated_tokens = min(len(tracks) * 80, 2400)
         if self.token_budget and not self.token_budget.can_spend(user_id, estimated_tokens):
             header, enriched = self._fallback(mood, tracks)
             for track in enriched:

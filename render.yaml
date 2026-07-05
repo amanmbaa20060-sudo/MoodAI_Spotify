@@ -62,7 +62,7 @@ services:
       - key: DROP_PARTITIONS
         value: "4"
       - key: LLM_TOKEN_BUDGET_PER_DAY
-        value: "5000"
+        value: "12000"
       - key: CORS_ALLOW_VERCEL
         value: "true"
     name: moodai-daily-drop
