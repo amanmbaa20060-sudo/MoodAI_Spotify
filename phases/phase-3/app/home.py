@@ -33,9 +33,7 @@ class HomeFeedComposer:
         visual_search_enabled: bool = True,
         drop_size_variant: str | None = None,
     ) -> dict:
-        drop = self.repository.list_drop(user_id, date.today())
-        if drop is None:
-            drop = self.orchestrator.generate_drop(user_id, active_mood)
+        drop = self.orchestrator.generate_drop(user_id, active_mood)
 
         fresh_candidates = self.repository.fetch_candidates(active_mood, limit=60)
         fresh_scored = self.ranker.score(fresh_candidates, active_mood)[:20]

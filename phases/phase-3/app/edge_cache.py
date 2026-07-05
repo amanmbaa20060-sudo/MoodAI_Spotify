@@ -57,12 +57,14 @@ class HomeEdgeCache:
         self._memory[key] = (time.time() + self.ttl_seconds, payload)
 
     def invalidate(self, user_id: str, mood: str | None = None) -> None:
+        client = self._redis()
         if mood is not None:
             keys = [self._key(user_id, mood)]
+        elif client:
+            keys = list(client.scan_iter(f"{self.PREFIX}{user_id}:*"))
         else:
             keys = [k for k in self._memory if k.startswith(f"{self.PREFIX}{user_id}:")]
 
-        client = self._redis()
         for key in keys:
             if client:
                 client.delete(key)

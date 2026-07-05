@@ -30,7 +30,7 @@ class DiscoveryOrchestrator:
     def generate_drop(self, user_id: str, mood: str, drop_date: date | None = None) -> dict:
         effective_date = drop_date or date.today()
         existing = self.repository.list_drop(user_id, effective_date)
-        if existing and existing.get("tracks"):
+        if existing and existing.get("tracks") and existing.get("mood_at_generation") == mood:
             return existing
 
         candidates = self.repository.fetch_candidates(mood, limit=500)

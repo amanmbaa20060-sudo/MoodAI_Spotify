@@ -253,9 +253,7 @@ def create_app(services: tuple | None = None) -> FastAPI:
     @app.get("/v1/discovery-drop", response_model=DiscoveryDropPayload)
     def get_discovery_drop(user_id: str = Depends(get_user_id)) -> dict:
         active_mood = app.state.mood_state.get_active_mood(user_id)
-        drop = app.state.repository.list_drop(user_id, date.today())
-        if drop is None:
-            drop = app.state.orchestrator.generate_drop(user_id, active_mood)
+        drop = app.state.orchestrator.generate_drop(user_id, active_mood)
         return {
             "drop_id": drop["drop_id"],
             "drop_date": str(drop["drop_date"]),

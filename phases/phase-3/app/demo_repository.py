@@ -203,6 +203,7 @@ class DemoRepository:
         drop = {
             "drop_id": f"demo-drop-{user_id}-{drop_date.isoformat()}",
             "drop_date": drop_date,
+            "mood_at_generation": active_mood,
             "drop_header": header,
             "header_method": header_method,
             "status": "READY",
